@@ -134,7 +134,7 @@ export default function AdminDashboard() {
     if (!isPending && !session?.user) {
       console.log("isPending", isPending);
       console.log("session", session?.user);
-      router.push("/login?redirect=/admin");
+      router.push("/adminstration/login?redirect=/adminstration/admin");
     }
   }, [session, isPending, router]);
 
@@ -152,8 +152,6 @@ export default function AdminDashboard() {
 
   // Show loading while checking auth
   if (isPending) {
-    console.log("ispending", isPending);
-    console.log("pending")
     return (
       <div className="min-h-screen bg-[#fafaf8] flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-[#D4AF37]" />
@@ -163,7 +161,6 @@ export default function AdminDashboard() {
 
   // Don't render if not authenticated
   if (!session?.user) {
-    console.log("sesson dismiss")
     return null;
   }
 
@@ -440,7 +437,7 @@ export default function AdminDashboard() {
       toast.error("Failed to logout");
     } else {
       localStorage.removeItem("bearer_token");
-      router.push("/login");
+      router.push("/adminstration/login");
     }
   };
 

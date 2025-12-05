@@ -7,7 +7,6 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
-
     // Single blog post by ID
     if (id) {
       if (!id || isNaN(parseInt(id))) {
@@ -22,7 +21,6 @@ export async function GET(request: NextRequest) {
         .from(blogPosts)
         .where(eq(blogPosts.id, parseInt(id)))
         .limit(1);
-
       if (blogPost.length === 0) {
         return NextResponse.json(
           { error: 'Blog post not found', code: 'NOT_FOUND' },

@@ -166,7 +166,7 @@ export default function BlogPage() {
                         asChild
                         className="bg-[#D4AF37] hover:bg-[#C4A030] text-white w-fit"
                       >
-                        <Link href={`/blog/${featuredPost.id}`}>
+                        <Link href={`/v3/blog/${featuredPost.id}`}>
                           Read Article <ArrowRight className="ml-2 w-4 h-4" />
                         </Link>
                       </Button>
@@ -202,7 +202,7 @@ export default function BlogPage() {
                       </div>
                       <div className="p-6">
                         <h3 className="font-display text-xl font-bold text-[#1a2332] mb-3 group-hover:text-[#D4AF37] transition-colors">
-                          <Link href={`/blog/${post.id}`}>{post.title}</Link>
+                          <Link href={`/v3/blog/${post.id}`}>{post.title}</Link>
                         </h3>
                         <p className="text-gray-600 mb-4 leading-relaxed">{post.excerpt}</p>
                         <div className="flex items-center text-xs text-gray-500 mb-4 space-x-4">
@@ -216,7 +216,7 @@ export default function BlogPage() {
                           </div>
                         </div>
                         <Link
-                          href={`/blog/${post.id}`}
+                          href={`/v3/blog/${post.id}`}
                           className="text-[#D4AF37] font-semibold text-sm hover:underline inline-flex items-center"
                         >
                           Read More <ArrowRight className="ml-1 w-4 h-4" />

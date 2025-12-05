@@ -68,32 +68,32 @@ export default function Footer() {
             <h3 className="font-display text-lg font-semibold mb-6">Quick Links</h3>
             <ul className="space-y-3">
               <li>
-                <Link href="/about" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
+                <Link href="/v3/about" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link href="/properties" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
+                <Link href="/v3/properties" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
                   Properties
                 </Link>
               </li>
               <li>
-                <Link href="/services" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
+                <Link href="/v3/services" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
                   Services
                 </Link>
               </li>
               <li>
-                <Link href="/gallery" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
+                <Link href="/v3/gallery" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
                   Gallery
                 </Link>
               </li>
               <li>
-                <Link href="/blog" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
+                <Link href="/v3/blog" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
                   Blog
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
+                <Link href="/v3/contact" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
                   Contact
                 </Link>
               </li>
@@ -105,32 +105,32 @@ export default function Footer() {
             <h3 className="font-display text-lg font-semibold mb-6">Property Types</h3>
             <ul className="space-y-3">
               <li>
-                <Link href="/properties?type=buy" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
+                <Link href="/v3/properties?type=buy" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
                   Buy Property
                 </Link>
               </li>
               <li>
-                <Link href="/properties?type=sell" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
+                <Link href="/v3/properties?type=sell" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
                   Sell Property
                 </Link>
               </li>
               <li>
-                <Link href="/properties?type=rent" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
+                <Link href="/v3/properties?type=rent" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
                   Rent Property
                 </Link>
               </li>
               <li>
-                <Link href="/properties?category=residential" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
+                <Link href="/v3/properties?category=residential" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
                   Residential
                 </Link>
               </li>
               <li>
-                <Link href="/properties?category=commercial" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
+                <Link href="/v3/properties?category=commercial" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
                   Commercial
                 </Link>
               </li>
               <li>
-                <Link href="/consultation" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
+                <Link href="/v3/consultation" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
                   Book Consultation
                 </Link>
               </li>
@@ -169,13 +169,13 @@ export default function Footer() {
               © {currentYear} Winst Realtors. All rights reserved.
             </p>
             <div className="flex space-x-6">
-              <Link href="/privacy" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
+              <Link href="/v3/privacy" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
                 Privacy Policy
               </Link>
-              <Link href="/terms" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
+              <Link href="/v3/terms" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
                 Terms of Service
               </Link>
-              <Link href="/sitemap" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
+              <Link href="/v3/sitemap" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
                 Sitemap
               </Link>
             </div>

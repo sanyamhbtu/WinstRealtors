@@ -19,11 +19,11 @@ export default function Navigation() {
   }, []);
 
   const propertyLinks = [
-    { name: "Buy Property", href: "/properties?type=buy" },
-    { name: "Sell Property", href: "/properties?type=sell" },
-    { name: "Rent Property", href: "/properties?type=rent" },
-    { name: "Commercial", href: "/properties?category=commercial" },
-    { name: "Residential", href: "/properties?category=residential" },
+    { name: "Buy Property", href: "/v3/properties?type=buy" },
+    { name: "Sell Property", href: "/v3/properties?type=sell" },
+    { name: "Rent Property", href: "/v3/properties?type=rent" },
+    { name: "Commercial", href: "/v3/properties?category=commercial" },
+    { name: "Residential", href: "/v3/properties?category=residential" },
   ];
 
   return (
@@ -38,15 +38,15 @@ export default function Navigation() {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-[#D4AF37] to-[#F5E6C8] rounded flex items-center justify-center">
-              <span className="text-[#1a2332] font-display font-bold text-xl">W</span>
+            <div className="w-20 h-20 md:w-25 md:h-25 lg:w-25 lg-h-25  rounded flex items-center justify-center">
+              <img src="https://res.cloudinary.com/dxxielg5u/image/upload/v1764957758/winst-removebg-preview_qancvd.png" alt="Winst Logo" />
             </div>
             <div className="flex flex-col">
               <span className="font-display text-xl font-bold text-[#1a2332]">
                 Winst Realtors
               </span>
               <span className="text-xs text-[#8b8b8b] tracking-wider">
-                LUXURY ESTATES
+                PRIVATE LIMITED
               </span>
             </div>
           </Link>
@@ -86,31 +86,31 @@ export default function Navigation() {
             </div>
 
             <Link
-              href="/about"
+              href="/v3/about"
               className="text-[#1a2332] hover:text-[#D4AF37] transition-colors font-medium"
             >
               About
             </Link>
             <Link
-              href="/services"
+              href="/v3/services"
               className="text-[#1a2332] hover:text-[#D4AF37] transition-colors font-medium"
             >
               Services
             </Link>
             <Link
-              href="/gallery"
+              href="/v3/gallery"
               className="text-[#1a2332] hover:text-[#D4AF37] transition-colors font-medium"
             >
               Gallery
             </Link>
             <Link
-              href="/blog"
+              href="/v3/blog"
               className="text-[#1a2332] hover:text-[#D4AF37] transition-colors font-medium"
             >
               Blog
             </Link>
             <Link
-              href="/contact"
+              href="/v3/contact"
               className="text-[#1a2332] hover:text-[#D4AF37] transition-colors font-medium"
             >
               Contact
@@ -124,7 +124,7 @@ export default function Navigation() {
               variant="outline"
               className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white"
             >
-              <Link href="/consultation">Book Consultation</Link>
+              <Link href="/v3/consultation">Book Consultation</Link>
             </Button>
           </div>
 
@@ -169,35 +169,35 @@ export default function Navigation() {
               </div>
             </div>
             <Link
-              href="/about"
+              href="/v3/about"
               className="block text-[#1a2332] hover:text-[#D4AF37] transition-colors font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
               About
             </Link>
             <Link
-              href="/services"
+              href="/v3/services"
               className="block text-[#1a2332] hover:text-[#D4AF37] transition-colors font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
               Services
             </Link>
             <Link
-              href="/gallery"
+              href="/v3/gallery"
               className="block text-[#1a2332] hover:text-[#D4AF37] transition-colors font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
               Gallery
             </Link>
             <Link
-              href="/blog"
+              href="/v3/blog"
               className="block text-[#1a2332] hover:text-[#D4AF37] transition-colors font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
               Blog
             </Link>
             <Link
-              href="/contact"
+              href="/v3/contact"
               className="block text-[#1a2332] hover:text-[#D4AF37] transition-colors font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
@@ -207,7 +207,7 @@ export default function Navigation() {
               asChild
               className="w-full bg-[#D4AF37] hover:bg-[#C4A030] text-white"
             >
-              <Link href="/consultation" onClick={() => setMobileMenuOpen(false)}>
+              <Link href="/v3/consultation" onClick={() => setMobileMenuOpen(false)}>
                 Book Consultation
               </Link>
             </Button>

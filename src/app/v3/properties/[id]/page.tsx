@@ -50,6 +50,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
   const [isFavorite, setIsFavorite] = useState(false);
 
   // Fetch property data from API
+  
   const { id } = React.use(params);
   useEffect(() => {
     const fetchProperty = async () => {
@@ -97,7 +98,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
             The property you're looking for doesn't exist or has been removed.
           </p>
           <Button asChild className="bg-[#D4AF37] hover:bg-[#B8941F] text-white">
-            <Link href="/properties">Back to Properties</Link>
+            <Link href="/v3/properties">Back to Properties</Link>
           </Button>
         </div>
       </div>
@@ -117,10 +118,10 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
 
   // Mock agent data (you can enhance this later with real agent data)
   const agent = {
-    name: "Victoria Sterling",
+    name: "Vanshika Tomar",
     image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop",
-    phone: "+1 (310) 555-0123",
-    email: "victoria@winstrealtors.com",
+    phone: "+91 3892849982",
+    email: "hr@winstrealtors.com",
   };
 
   return (
@@ -189,6 +190,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                     index === currentImage ? "ring-4 ring-[#D4AF37]" : "opacity-60 hover:opacity-100"
                   }`}
                 >
+                  console.log("imgses", {img});
                   <Image src={img} alt={`View ${index + 1}`} fill className="object-cover" />
                 </button>
               ))}
@@ -316,7 +318,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
               </div>
 
               {/* Map */}
-              <div className="bg-white rounded-lg p-8 shadow-md">
+              {/* <div className="bg-white rounded-lg p-8 shadow-md">
                 <h2 className="font-display text-2xl font-bold text-[#1a2332] mb-6">
                   Location
                 </h2>
@@ -329,7 +331,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                     </p>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             {/* Sidebar */}
@@ -416,7 +418,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                 </div>
 
                 {/* CTA */}
-                <div className="bg-gradient-to-br from-[#1a2332] to-[#2d3e50] rounded-lg p-6 text-white">
+                {/* <div className="bg-gradient-to-br from-[#1a2332] to-[#2d3e50] rounded-lg p-6 text-white">
                   <h3 className="font-display text-xl font-bold mb-3">
                     Need Financing?
                   </h3>
@@ -426,7 +428,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                   <Button className="w-full bg-[#D4AF37] hover:bg-[#C4A030] text-white">
                     Calculate Mortgage
                   </Button>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

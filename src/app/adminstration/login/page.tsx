@@ -40,7 +40,7 @@ export default function LoginPage() {
       
       // Get redirect URL from query params or default to home
       const searchParams = new URLSearchParams(window.location.search);
-      const redirect = searchParams.get("redirect") || "/";
+      const redirect = searchParams.get("redirect") || "/adminstration/admin";
       
       setTimeout(() => {
         router.push(redirect);
@@ -60,14 +60,15 @@ export default function LoginPage() {
   };
 
   return (
+    
     <main className="min-h-screen flex">
       {/* Left Side - Form */}
       <div className="flex-1 flex items-center justify-center p-8 bg-white">
         <div className="w-full max-w-md">
           <div className="mb-8">
-            <Link href="/" className="flex items-center space-x-3 mb-8">
-              <div className="w-10 h-10 bg-gradient-to-br from-[#D4AF37] to-[#F5E6C8] rounded flex items-center justify-center">
-                <span className="text-[#1a2332] font-display font-bold text-xl">W</span>
+            <Link href="/adminstration" className="flex items-center space-x-3 mb-8">
+              <div className="w-25 h-25  rounded flex items-center justify-center">
+                <img src="https://res.cloudinary.com/dxxielg5u/image/upload/v1764957758/winst-removebg-preview_qancvd.png" alt="Winst Logo" />
               </div>
               <span className="font-display text-xl font-bold text-[#1a2332]">
                 Winst Realtors
@@ -161,7 +162,7 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="mt-8 text-center">
+          {/* <div className="mt-8 text-center">
             <p className="text-gray-600">
               Don't have an account?{" "}
               <Link
@@ -171,7 +172,7 @@ export default function LoginPage() {
                 Sign up
               </Link>
             </p>
-          </div>
+          </div> */}
         </div>
       </div>
 

@@ -2,9 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import ErrorReporter from "@/components/ErrorReporter";
 import Script from "next/script";
-import Navigation from "@/components/shared/Navigation";
-import Footer from "@/components/shared/Footer";
-import WhatsAppButton from "@/components/shared/WhatsAppButton";
 import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
@@ -54,10 +51,7 @@ export default function RootLayout({
           data-debug="true"
           data-custom-data='{"appName": "YourApp", "version": "1.0.0", "greeting": "hi"}'
         />
-        <Navigation />
         {children}
-        <Footer />
-        <WhatsAppButton />
         <Toaster />
       </body>
     </html>

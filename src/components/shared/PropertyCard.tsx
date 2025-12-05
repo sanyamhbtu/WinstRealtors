@@ -99,7 +99,7 @@ export default function PropertyCard({
             asChild
             className="bg-[#1a2332] hover:bg-[#2d3e50] text-white"
           >
-            <Link href={`/properties/${id}`}>View Details</Link>
+            <Link href={`/v3/properties/${id}`}>View Details</Link>
           </Button>
         </div>
       </div>

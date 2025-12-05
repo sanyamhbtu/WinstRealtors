@@ -9,6 +9,10 @@ import PropertyCard from "@/components/shared/PropertyCard";
 import { ArrowRight, Building, DollarSign, Star, Award, ChevronLeft, ChevronRight, Search, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
+import Navigation from "@/components/shared/Navigation";
+import Footer from "@/components/shared/Footer";
+import WhatsAppButton from "@/components/shared/WhatsAppButton";
+
 export default function Home() {
   const router = useRouter();
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
@@ -128,7 +132,7 @@ export default function Home() {
       params.set("priceRange", searchFilters.priceRange);
     }
     
-    router.push(`/properties${params.toString() ? `?${params.toString()}` : ""}`);
+    router.push(`/v3/properties${params.toString() ? `?${params.toString()}` : ""}`);
   };
 
   const nextTestimonial = () => {
@@ -148,11 +152,12 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
+      <Navigation />
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/project-uploads/43b9d188-159a-4035-ab5b-2097544eaef3/generated_images/ultra-luxury-modern-mansion-exterior-con-d9c1a564-20251121133418.jpg"
+            src="https://res.cloudinary.com/dxxielg5u/image/upload/v1764959244/herowinstimage_mbqewn.jpg"
             alt="Luxury Property"
             fill
             className="object-cover"
@@ -219,7 +224,7 @@ export default function Home() {
                 size="lg"
                 className="bg-[#D4AF37] hover:bg-[#C4A030] text-white text-lg px-8 py-6"
               >
-                <Link href="/properties">
+                <Link href="/v3/properties">
                   Explore Properties <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
@@ -227,20 +232,20 @@ export default function Home() {
                 asChild
                 size="lg"
                 variant="outline"
-                className="border-2 border-white text-white hover:bg-white hover:text-[#1a2332] text-lg px-8 py-6"
+                className="border-2 border-white text-black hover:bg-amber-50 hover:text-[#1a2332] text-lg px-8 py-6"
               >
-                <Link href="/consultation">Book Consultation</Link>
+                <Link href="/v3/consultation">Book Consultation</Link>
               </Button>
             </div>
           </div>
         </div>
 
         {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10">
+        {/* <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10">
           <div className="w-6 h-10 border-2 border-white rounded-full flex items-start justify-center p-2 animate-bounce">
             <div className="w-1 h-3 bg-white rounded-full" />
           </div>
-        </div>
+        </div> */}
       </section>
 
       {/* Stats Section */}
@@ -301,7 +306,7 @@ export default function Home() {
                   size="lg"
                   className="bg-[#1a2332] hover:bg-[#2d3e50] text-white px-8"
                 >
-                  <Link href="/properties">
+                  <Link href="/v3/properties">
                     View All Properties <ArrowRight className="ml-2 w-5 h-5" />
                   </Link>
                 </Button>
@@ -343,7 +348,7 @@ export default function Home() {
                 size="lg"
                 className="bg-[#D4AF37] hover:bg-[#C4A030] text-white"
               >
-                <Link href="/about">
+                <Link href="/v3/about">
                   Learn More About Us <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
@@ -499,7 +504,7 @@ export default function Home() {
               size="lg"
               className="bg-[#D4AF37] hover:bg-[#C4A030] text-white text-lg px-8 py-6"
             >
-              <Link href="/consultation">
+              <Link href="/v3/consultation">
                 Book Consultation <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
@@ -507,13 +512,15 @@ export default function Home() {
               asChild
               size="lg"
               variant="outline"
-              className="border-2 border-white text-white hover:bg-white hover:text-[#1a2332] text-lg px-8 py-6"
+              className="border-2 border-white text-black hover:bg-amber-50 hover:text-[#1a2332] text-lg px-8 py-6"
             >
-              <Link href="/contact">Contact Us</Link>
+              <Link href="/v3/contact">Contact Us</Link>
             </Button>
           </div>
         </div>
       </section>
+      <WhatsAppButton />
+      <Footer />
     </main>
   );
 }
