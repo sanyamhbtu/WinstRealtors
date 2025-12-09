@@ -210,19 +210,19 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <div className="flex items-center gap-3 mb-2">
-                      <span className="bg-[#D4AF37] text-white px-3 py-1 rounded-full text-sm font-semibold">
+                      <span className="bg-[#D4AF37] text-white px-3 py-1 rounded-full text-xs md:text-sm font-semibold">
                         {property.category}
                       </span>
-                      <span className="bg-[#1a2332] text-white px-3 py-1 rounded-full text-sm font-semibold">
+                      <span className="bg-[#1a2332] text-white px-3 py-1 rounded-full text-xs md:text-sm font-semibold">
                         {property.type}
                       </span>
                       {property.featured && (
-                        <span className="bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                        <span className="bg-purple-600 text-white px-3 py-1 rounded-full text-xs md:text-sm font-semibold">
                           Featured
                         </span>
                       )}
                     </div>
-                    <h1 className="font-display text-4xl font-bold text-[#1a2332] mb-3">
+                    <h1 className="font-display text-2xl md:text-4xl lg:text-4xl font-bold text-[#1a2332] mb-3">
                       {property.title}
                     </h1>
                     <div className="flex items-center text-gray-600 text-lg">
@@ -232,7 +232,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-gray-500 mb-1">Price</p>
-                    <p className="font-display text-4xl font-bold text-[#D4AF37]">
+                    <p className="font-display text-xl md:text-4xl font-bold text-[#D4AF37]">
                       {property.price}
                     </p>
                   </div>

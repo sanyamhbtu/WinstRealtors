@@ -139,10 +139,6 @@ export default function AdminDashboard() {
           endpoint = "/api/gallery-items?limit=50";
           setter = setGalleryItems;
           break;
-        // case "settings":
-        //   endpoint = "/api/admin/admin-emails";
-        //   setter = setAdminEmails;
-        //   break;
       }
 
       if (endpoint && setter) {
@@ -684,7 +680,6 @@ export default function AdminDashboard() {
               { id: "partners", icon: Users, label: "Partners" },
               { id: "bookings", icon: Calendar, label: "Bookings" },
               { id: "contacts", icon: MessageSquare, label: "Contacts" },
-              { id: "faqs", icon: MessageSquare, label: "FAQs" },
               { id: "settings", icon: Settings, label: "Settings" },
             ].map((item) => {
               const Icon = item.icon;
@@ -1370,7 +1365,7 @@ export default function AdminDashboard() {
           )}
 
           {/* FAQs Management */}
-          {activeTab === "faqs" && (
+          {/* {activeTab === "faqs" && (
             <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
               {loading ? (
                 <div className="flex justify-center py-12">
@@ -1426,7 +1421,7 @@ export default function AdminDashboard() {
                 </div>
               )}
             </div>
-          )}
+          )} */}
 
           {/* Gallery Management */}
           {activeTab === "gallery" && (
