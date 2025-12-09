@@ -19,7 +19,11 @@ import {
   Loader2,
   X,
   Save,
-  CalendarCheck
+  CalendarCheck,
+  Lock,
+  Mail,
+  Settings,
+  Menu
 } from "lucide-react";
 import { toast } from "sonner";
 import { useSession, authClient } from "@/lib/auth-client";
@@ -42,6 +46,13 @@ interface DashboardStats {
   totalGalleryItems: number;
   publishedGalleryItems: number;
 }
+interface AdminEmail {
+  id: number;
+  email: string;
+  addedBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default function AdminDashboard() {
   const { data: session, isPending } = useSession();
@@ -63,7 +74,20 @@ export default function AdminDashboard() {
 
   const [isCreating, setIsCreating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  // Settings state
+  const [adminEmails, setAdminEmails] = useState<AdminEmail[]>([]);
+  const [newAdminEmail, setNewAdminEmail] = useState("");
+  const [newAdminName, setNewAdminName] = useState("");
+  const [newAdminPassword, setNewAdminPassword] = useState("");
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: ""
+  });
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [isAddingEmail, setIsAddingEmail] = useState(false);
   // Fetch dashboard stats
   const fetchStats = async () => {
     try {
@@ -115,6 +139,10 @@ export default function AdminDashboard() {
           endpoint = "/api/gallery-items?limit=50";
           setter = setGalleryItems;
           break;
+        // case "settings":
+        //   endpoint = "/api/admin/admin-emails";
+        //   setter = setAdminEmails;
+        //   break;
       }
 
       if (endpoint && setter) {
@@ -129,11 +157,153 @@ export default function AdminDashboard() {
     }
   };
 
+    // Fetch admin emails
+  const fetchAdminEmails = async () => {
+    try {
+      const token = localStorage.getItem("bearer_token");
+      const res = await fetch("/api/admin/admin-emails", {
+        headers: {
+          ...(token && { Authorization: `Bearer ${token}` })
+        }
+      });
+      console.log("resadmin", res);
+
+      if (res.ok) {
+        const data = await res.json();
+        setAdminEmails(data);
+      } else if (res.status === 403) {
+        toast.error("You don't have admin access");
+      }
+    } catch (error) {
+      toast.error("Failed to load admin emails");
+    }
+  };
+
+  // Add admin email
+  const handleAddAdminEmail = async () => {
+    if (!newAdminEmail || !newAdminEmail.includes("@")) {
+      toast.error("Please enter a valid email");
+      return;
+    }
+
+    if (!newAdminName || newAdminName.trim() === "") {
+      toast.error("Please enter the user's name");
+      return;
+    }
+
+    if (!newAdminPassword || newAdminPassword.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+
+    setIsAddingEmail(true);
+    try {
+      const token = localStorage.getItem("bearer_token");
+      const res = await fetch("/api/admin/admin-emails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` })
+        },
+        body: JSON.stringify({ 
+          email: newAdminEmail,
+          name: newAdminName,
+          password: newAdminPassword
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        toast.success(data.message || "Admin user created successfully");
+        setNewAdminEmail("");
+        setNewAdminName("");
+        setNewAdminPassword("");
+        fetchAdminEmails();
+      } else {
+        const error = await res.json();
+        toast.error(error.error || "Failed to add admin email");
+      }
+    } catch (error) {
+      toast.error("An error occurred");
+    } finally {
+      setIsAddingEmail(false);
+    }
+  };
+
+  // Remove admin email
+  const handleRemoveAdminEmail = async (email: string) => {
+    if (!confirm(`Are you sure you want to remove ${email} from admin access?`)) return;
+
+    try {
+      const token = localStorage.getItem("bearer_token");
+      const res = await fetch(`/api/admin/admin-emails?email=${encodeURIComponent(email)}`, {
+        method: "DELETE",
+        headers: {
+          ...(token && { Authorization: `Bearer ${token}` })
+        }
+      });
+
+      if (res.ok) {
+        toast.success("Admin email removed successfully");
+        fetchAdminEmails();
+      } else {
+        const error = await res.json();
+        toast.error(error.error || "Failed to remove admin email");
+      }
+    } catch (error) {
+      toast.error("An error occurred");
+    }
+  };
+
+  // Change password
+  const handleChangePassword = async () => {
+    if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
+      toast.error("Please fill in all password fields");
+      return;
+    }
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      toast.error("New passwords do not match");
+      return;
+    }
+
+    if (passwordForm.newPassword.length < 8) {
+      toast.error("New password must be at least 8 characters");
+      return;
+    }
+
+    setIsChangingPassword(true);
+    try {
+      const token = localStorage.getItem("bearer_token");
+      const res = await fetch("/api/admin/change-password", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` })
+        },
+        body: JSON.stringify({
+          currentPassword: passwordForm.currentPassword,
+          newPassword: passwordForm.newPassword
+        })
+      });
+
+      if (res.ok) {
+        toast.success("Password changed successfully");
+        setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+      } else {
+        const error = await res.json();
+        toast.error(error.error || "Failed to change password");
+      }
+    } catch (error) {
+      toast.error("An error occurred");
+    } finally {
+      setIsChangingPassword(false);
+    }
+  };
+
   // ALL useEffect hooks must be called before any conditional returns
   useEffect(() => {
     if (!isPending && !session?.user) {
-      console.log("isPending", isPending);
-      console.log("session", session?.user);
       router.push("/adminstration/login?redirect=/adminstration/admin");
     }
   }, [session, isPending, router]);
@@ -149,6 +319,17 @@ export default function AdminDashboard() {
       fetchData();
     }
   }, [activeTab, session?.user]);
+
+  useEffect(() =>{
+    if(session?.user && activeTab === "settings"){
+      fetchAdminEmails()
+    }
+  },[activeTab, session?.user]);
+
+    const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId);
+    setIsSidebarOpen(false);
+  };
 
   // Show loading while checking auth
   if (isPending) {
@@ -166,7 +347,6 @@ export default function AdminDashboard() {
 
   // Add new item
   const handleAdd = (type: string) => {
-    console.log("handleAdd called with type:", type);
     setIsCreating(true);
     setEditType(type);
     
@@ -236,7 +416,6 @@ export default function AdminDashboard() {
     };
     
     const template = templates[type] || {};
-    console.log("Setting template:", template);
     setEditingItem(template);
     setShowModal(true);
     toast.info(`Creating new ${type.slice(0, -1)}...`);
@@ -253,7 +432,6 @@ export default function AdminDashboard() {
   // Save edited or new item
   const handleSaveEdit = async () => {
     if (!editingItem) {
-      console.error("No editing item");
       toast.error("No item to save");
       return;
     }
@@ -287,7 +465,6 @@ export default function AdminDashboard() {
     }
 
     setIsSaving(true);
-    console.log("Saving item:", { isCreating, editType, editingItem });
 
     try {
       const endpoints: Record<string, string> = {
@@ -306,10 +483,8 @@ export default function AdminDashboard() {
         ? endpoints[editType]
         : `${endpoints[editType]}?id=${editingItem.id}`;
 
-      console.log("Making request:", { method, url });
 
       const token = localStorage.getItem("bearer_token");
-      console.log("Token present:", !!token);
 
       const res = await fetch(url, {
         method,
@@ -320,11 +495,9 @@ export default function AdminDashboard() {
         body: JSON.stringify(editingItem),
       });
 
-      console.log("Response status:", res.status);
 
       if (res.ok) {
         const data = await res.json();
-        console.log("Response data:", data);
         toast.success(isCreating ? "Item created successfully!" : "Item updated successfully!");
         setShowModal(false);
         setEditingItem(null);
@@ -333,11 +506,9 @@ export default function AdminDashboard() {
         await fetchStats();
       } else {
         const error = await res.json();
-        console.error("Error response:", error);
         toast.error(error.error || error.message || "Failed to save item");
       }
     } catch (error) {
-      console.error("Catch error:", error);
       toast.error("An error occurred while saving");
     } finally {
       setIsSaving(false);
@@ -477,12 +648,32 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-[#fafaf8] flex">
+      {/* Mobile backdrop */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 bg-[#1a2332] text-white fixed h-full">
+      <aside className={`
+        w-64 bg-[#1a2332] text-white fixed h-full z-50 transition-transform duration-300
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        lg:translate-x-0
+      `}>
         <div className="p-6">
-          <h2 className="font-display text-2xl font-bold text-[#D4AF37] mb-8">
-            Winst Admin
-          </h2>
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="font-display text-2xl font-bold text-[#D4AF37]">
+              Winst Admin
+            </h2>
+            <button
+              onClick={() => setIsSidebarOpen(false)}
+              className="lg:hidden p-2 hover:bg-white/10 rounded-lg"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
           <nav className="space-y-2">
             {[
               { id: "dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -494,12 +685,13 @@ export default function AdminDashboard() {
               { id: "bookings", icon: Calendar, label: "Bookings" },
               { id: "contacts", icon: MessageSquare, label: "Contacts" },
               { id: "faqs", icon: MessageSquare, label: "FAQs" },
+              { id: "settings", icon: Settings, label: "Settings" },
             ].map((item) => {
               const Icon = item.icon;
               return (
                 <button
                   key={item.id}
-                  onClick={() => setActiveTab(item.id)}
+                  onClick={() => handleTabChange(item.id)}
                   className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
                     activeTab === item.id
                       ? "bg-[#D4AF37] text-white"
@@ -525,30 +717,41 @@ export default function AdminDashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 ml-64 p-8">
+      <main className="flex-1 lg:ml-64 p-4 md:p-6 lg:p-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="mb-8 flex justify-between items-center">
-            <div>
-              <h1 className="font-display text-3xl font-bold text-[#1a2332] mb-2">
-                {activeTab === "dashboard" && "Dashboard Overview"}
-                {activeTab === "properties" && "Manage Properties"}
-                {activeTab === "blogs" && "Blog Management"}
-                {activeTab === "gallery" && "Gallery Management"}
-                {activeTab === "testimonials" && "Testimonials"}
-                {activeTab === "partners" && "Partners"}
-                {activeTab === "bookings" && "Consultation Bookings"}
-                {activeTab === "contacts" && "Contact Submissions"}
-                {activeTab === "faqs" && "FAQs Management"}
-              </h1>
-              <p className="text-gray-600">Welcome back, {session.user.name || session.user.email}</p>
+          <div className="mb-6 md:mb-8">
+            <div className="flex items-center gap-4 mb-4">
+              {/* Mobile menu button */}
+              <button
+                onClick={() => setIsSidebarOpen(true)}
+                className="lg:hidden p-2 hover:bg-gray-100 rounded-lg"
+              >
+                <Menu className="w-6 h-6 text-[#1a2332]" />
+              </button>
+              
+              <div className="flex-1">
+                <h1 className="font-display text-2xl md:text-3xl font-bold text-[#1a2332] mb-1 md:mb-2">
+                  {activeTab === "dashboard" && "Dashboard Overview"}
+                  {activeTab === "properties" && "Manage Properties"}
+                  {activeTab === "blogs" && "Blog Management"}
+                  {activeTab === "gallery" && "Gallery Management"}
+                  {activeTab === "testimonials" && "Testimonials"}
+                  {activeTab === "partners" && "Partners"}
+                  {activeTab === "bookings" && "Consultation Bookings"}
+                  {activeTab === "contacts" && "Contact Submissions"}
+                  {activeTab === "faqs" && "FAQs Management"}
+                  {activeTab === "settings" && "Admin Settings"}
+                </h1>
+                <p className="text-sm md:text-base text-gray-600">Welcome back, {session.user.name || session.user.email}</p>
+              </div>
             </div>
             
             {/* Add New Button */}
-            {activeTab !== "dashboard" && activeTab !== "contacts" && (
+            {activeTab !== "dashboard" && activeTab !== "contacts" && activeTab !== "settings" && (
               <Button
                 onClick={() => handleAdd(activeTab)}
-                className="bg-[#D4AF37] hover:bg-[#B8941F] text-white"
+                className="bg-[#D4AF37] hover:bg-[#B8941F] text-white w-full sm:w-auto"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add New
@@ -558,43 +761,43 @@ export default function AdminDashboard() {
 
           {/* Dashboard Content */}
           {activeTab === "dashboard" && (
-            <div className="space-y-8">
+            <div className="space-y-6 md:space-y-8">
               {/* Stats Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                 {statCards.map((stat, index) => {
                   const Icon = stat.icon;
                   return (
-                    <div key={index} className="bg-white rounded-lg p-6 shadow-md">
+                    <div key={index} className="bg-white rounded-lg p-4 md:p-6 shadow-md">
                       <div className="flex items-center justify-between mb-4">
-                        <div className={`w-12 h-12 ${stat.color} rounded-lg flex items-center justify-center`}>
-                          <Icon className="w-6 h-6 text-white" />
+                        <div className={`w-10 h-10 md:w-12 md:h-12 ${stat.color} rounded-lg flex items-center justify-center`}>
+                          <Icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
                         </div>
                       </div>
-                      <p className="text-gray-600 text-sm mb-1">{stat.label}</p>
-                      <p className="font-display text-3xl font-bold text-[#1a2332]">{stat.value}</p>
+                      <p className="text-gray-600 text-xs md:text-sm mb-1">{stat.label}</p>
+                      <p className="font-display text-2xl md:text-3xl font-bold text-[#1a2332]">{stat.value}</p>
                     </div>
                   );
                 })}
               </div>
 
               {/* Quick Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white rounded-lg p-6 shadow-md">
-                  <h3 className="font-semibold text-lg mb-4">Blog Posts</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                <div className="bg-white rounded-lg p-4 md:p-6 shadow-md">
+                  <h3 className="font-semibold text-base md:text-lg mb-4">Blog Posts</h3>
                   <div className="space-y-2">
                     <p className="text-sm text-gray-600">Total: {stats?.totalBlogPosts || 0}</p>
                     <p className="text-sm text-gray-600">Published: {stats?.publishedBlogPosts || 0}</p>
                   </div>
                 </div>
-                <div className="bg-white rounded-lg p-6 shadow-md">
-                  <h3 className="font-semibold text-lg mb-4">Bookings</h3>
+                <div className="bg-white rounded-lg p-4 md:p-6 shadow-md">
+                  <h3 className="font-semibold text-base md:text-lg mb-4">Bookings</h3>
                   <div className="space-y-2">
                     <p className="text-sm text-gray-600">Pending: {stats?.pendingBookings || 0}</p>
                     <p className="text-sm text-gray-600">Confirmed: {stats?.confirmedBookings || 0}</p>
                   </div>
                 </div>
-                <div className="bg-white rounded-lg p-6 shadow-md">
-                  <h3 className="font-semibold text-lg mb-4">Contacts</h3>
+                <div className="bg-white rounded-lg p-4 md:p-6 shadow-md">
+                  <h3 className="font-semibold text-base md:text-lg mb-4">Contacts</h3>
                   <div className="space-y-2">
                     <p className="text-sm text-gray-600">Unread: {stats?.unreadContacts || 0}</p>
                     <p className="text-sm text-gray-600">Total: {stats?.totalContacts || 0}</p>
@@ -604,53 +807,298 @@ export default function AdminDashboard() {
             </div>
           )}
 
+          {/* Settings Content */}
+          {activeTab === "settings" && (
+            <div className="space-y-6 md:space-y-8">
+              {/* Change Password Section */}
+              <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 bg-[#D4AF37]/10 rounded-lg flex items-center justify-center">
+                    <Lock className="w-5 h-5 text-[#D4AF37]" />
+                  </div>
+                  <div>
+                    <h2 className="font-display text-xl font-bold text-[#1a2332]">Change Password</h2>
+                    <p className="text-sm text-gray-600">Update your admin password</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4 max-w-md">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
+                    <input
+                      type="password"
+                      value={passwordForm.currentPassword}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
+                      autoComplete="current-password"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+                    <input
+                      type="password"
+                      value={passwordForm.newPassword}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
+                      autoComplete="new-password"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
+                    <input
+                      type="password"
+                      value={passwordForm.confirmPassword}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
+                      autoComplete="new-password"
+                    />
+                  </div>
+                  <Button
+                    onClick={handleChangePassword}
+                    disabled={isChangingPassword}
+                    className="bg-[#D4AF37] hover:bg-[#B8941F] text-white"
+                  >
+                    {isChangingPassword ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Changing...
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="w-4 h-4 mr-2" />
+                        Change Password
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Admin Emails Section */}
+              <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 bg-[#D4AF37]/10 rounded-lg flex items-center justify-center">
+                    <Mail className="w-5 h-5 text-[#D4AF37]" />
+                  </div>
+                  <div>
+                    <h2 className="font-display text-xl font-bold text-[#1a2332]">Admin Email Management</h2>
+                    <p className="text-sm text-gray-600">Create new admin users with full dashboard access</p>
+                  </div>
+                </div>
+
+                {/* Add New Admin Email */}
+                <div className="mb-6 max-w-3xl">
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    Add New Admin User
+                    <span className="block text-xs font-normal text-gray-500 mt-1">
+                      Create a new user account with admin privileges. They can login immediately with the credentials below.
+                    </span>
+                  </label>
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <input
+                        type="text"
+                        value={newAdminName}
+                        onChange={(e) => setNewAdminName(e.target.value)}
+                        placeholder="Full Name"
+                        className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
+                      />
+                      <input
+                        type="email"
+                        value={newAdminEmail}
+                        onChange={(e) => setNewAdminEmail(e.target.value)}
+                        placeholder="Email Address"
+                        className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
+                      />
+                      <input
+                        type="password"
+                        value={newAdminPassword}
+                        onChange={(e) => setNewAdminPassword(e.target.value)}
+                        placeholder="Password (min 8 chars)"
+                        className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
+                      />
+                    </div>
+                    <Button
+                      onClick={handleAddAdminEmail}
+                      disabled={isAddingEmail}
+                      className="bg-[#D4AF37] hover:bg-[#B8941F] text-white w-full md:w-auto"
+                    >
+                      {isAddingEmail ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Creating...
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="w-4 h-4 mr-2" />
+                          Create Admin User
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Admin Emails List */}
+                <div>
+                  <h3 className="font-semibold text-gray-700 mb-4">Current Admin Users</h3>
+                  <div className="overflow-x-auto -mx-4 md:mx-0">
+                    <div className="inline-block min-w-full align-middle">
+                      <table className="min-w-full">
+                        <thead>
+                          <tr className="border-b border-gray-200">
+                            <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Email</th>
+                            <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Added By</th>
+                            <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Added On</th>
+                            <th className="text-right py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {adminEmails.map((admin) => (
+                            <tr key={admin.id} className="border-b border-gray-100 hover:bg-gray-50">
+                              <td className="py-3 px-3 md:px-4 text-sm md:text-base font-medium">{admin.email}</td>
+                              <td className="py-3 px-3 md:px-4 text-sm md:text-base text-gray-600">{admin.addedBy}</td>
+                              <td className="py-3 px-3 md:px-4 text-sm md:text-base text-gray-600">
+                                {new Date(admin.createdAt).toLocaleDateString()}
+                              </td>
+                              <td className="py-3 px-3 md:px-4">
+                                <div className="flex items-center justify-end">
+                                  <button
+                                    onClick={() => handleRemoveAdminEmail(admin.email)}
+                                    disabled={admin.email === session?.user?.email}
+                                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    title={admin.email === session?.user?.email ? "Cannot remove your own access" : "Remove admin access"}
+                                  >
+                                    <Trash2 className="w-4 h-4 text-red-600" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                          {adminEmails.length === 0 && (
+                            <tr>
+                              <td colSpan={4} className="py-8 text-center text-gray-500">
+                                No admin users found
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Properties Management */}
           {activeTab === "properties" && (
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
               {loading ? (
                 <div className="flex justify-center py-12">
                   <Loader2 className="w-8 h-8 animate-spin text-[#D4AF37]" />
                 </div>
               ) : (
                 <>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
+                  <div className="overflow-x-auto -mx-4 md:mx-0">
+                    <div className="inline-block min-w-full align-middle">
+                      <table className="min-w-full">
+                        <thead>
+                          <tr className="border-b border-gray-200">
+                            <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Property</th>
+                            <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base whitespace-nowrap">Location</th>
+                            <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base whitespace-nowrap">Price</th>
+                            <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Status</th>
+                            <th className="text-right py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base whitespace-nowrap">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {properties.map((property) => (
+                            <tr key={property.id} className="border-b border-gray-100 hover:bg-gray-50">
+                              <td className="py-3 px-3 md:px-4 text-sm md:text-base">{property.title}</td>
+                              <td className="py-3 px-3 md:px-4 text-sm md:text-base whitespace-nowrap">{property.location}</td>
+                              <td className="py-3 px-3 md:px-4 font-semibold text-[#D4AF37] text-sm md:text-base whitespace-nowrap">{property.price}</td>
+                              <td className="py-3 px-3 md:px-4">
+                                <span className={`px-2 md:px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${
+                                  property.status === "Active" 
+                                    ? "bg-green-100 text-green-800" 
+                                    : property.status === "Pending"
+                                    ? "bg-yellow-100 text-yellow-800"
+                                    : "bg-gray-100 text-gray-800"
+                                }`}>
+                                  {property.status}
+                                </span>
+                              </td>
+                              <td className="py-3 px-3 md:px-4">
+                                <div className="flex items-center justify-end space-x-1 md:space-x-2">
+                                  <button 
+                                    onClick={() => handleEdit(property, "properties")}
+                                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                  >
+                                    <Edit className="w-4 h-4 text-blue-600" />
+                                  </button>
+                                  <button 
+                                    onClick={() => handleDelete(property.id, "properties")}
+                                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                  >
+                                    <Trash2 className="w-4 h-4 text-red-600" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Blog Posts Management */}
+          {activeTab === "blogs" && (
+            <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
+              {loading ? (
+                <div className="flex justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-[#D4AF37]" />
+                </div>
+              ) : (
+                <div className="overflow-x-auto -mx-4 md:mx-0">
+                  <div className="inline-block min-w-full align-middle">
+                    <table className="min-w-full">
                       <thead>
                         <tr className="border-b border-gray-200">
-                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Property</th>
-                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Location</th>
-                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Price</th>
-                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
-                          <th className="text-right py-3 px-4 font-semibold text-gray-700">Actions</th>
+                          <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Title</th>
+                          <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Author</th>
+                          <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Category</th>
+                          <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Status</th>
+                          <th className="text-right py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base whitespace-nowrap">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {properties.map((property) => (
-                          <tr key={property.id} className="border-b border-gray-100 hover:bg-gray-50">
-                            <td className="py-3 px-4">{property.title}</td>
-                            <td className="py-3 px-4">{property.location}</td>
-                            <td className="py-3 px-4 font-semibold text-[#D4AF37]">{property.price}</td>
-                            <td className="py-3 px-4">
-                              <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                                property.status === "Active" 
+                        {blogPosts.map((post) => (
+                          <tr key={post.id} className="border-b border-gray-100 hover:bg-gray-50">
+                            <td className="py-3 px-3 md:px-4 text-sm md:text-base">{post.title}</td>
+                            <td className="py-3 px-3 md:px-4 text-sm md:text-base">{post.author}</td>
+                            <td className="py-3 px-3 md:px-4 text-sm md:text-base">{post.category}</td>
+                            <td className="py-3 px-3 md:px-4">
+                              <span className={`px-2 md:px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${
+                                post.published 
                                   ? "bg-green-100 text-green-800" 
-                                  : property.status === "Pending"
-                                  ? "bg-yellow-100 text-yellow-800"
                                   : "bg-gray-100 text-gray-800"
                               }`}>
-                                {property.status}
+                                {post.published ? "Published" : "Draft"}
                               </span>
                             </td>
-                            <td className="py-3 px-4">
-                              <div className="flex items-center justify-end space-x-2">
+                            <td className="py-3 px-3 md:px-4">
+                              <div className="flex items-center justify-end space-x-1 md:space-x-2">
                                 <button 
-                                  onClick={() => handleEdit(property, "properties")}
+                                  onClick={() => handleEdit(post, "blogs")}
                                   className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                                 >
                                   <Edit className="w-4 h-4 text-blue-600" />
                                 </button>
                                 <button 
-                                  onClick={() => handleDelete(property.id, "properties")}
+                                  onClick={() => handleDelete(post.id, "blogs")}
                                   className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                                 >
                                   <Trash2 className="w-4 h-4 text-red-600" />
@@ -662,65 +1110,6 @@ export default function AdminDashboard() {
                       </tbody>
                     </table>
                   </div>
-                </>
-              )}
-            </div>
-          )}
-
-          {/* Blog Posts Management */}
-          {activeTab === "blogs" && (
-            <div className="bg-white rounded-lg shadow-md p-6">
-              {loading ? (
-                <div className="flex justify-center py-12">
-                  <Loader2 className="w-8 h-8 animate-spin text-[#D4AF37]" />
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-200">
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Title</th>
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Author</th>
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Category</th>
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
-                        <th className="text-right py-3 px-4 font-semibold text-gray-700">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {blogPosts.map((post) => (
-                        <tr key={post.id} className="border-b border-gray-100 hover:bg-gray-50">
-                          <td className="py-3 px-4">{post.title}</td>
-                          <td className="py-3 px-4">{post.author}</td>
-                          <td className="py-3 px-4">{post.category}</td>
-                          <td className="py-3 px-4">
-                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                              post.published 
-                                ? "bg-green-100 text-green-800" 
-                                : "bg-gray-100 text-gray-800"
-                            }`}>
-                              {post.published ? "Published" : "Draft"}
-                            </span>
-                          </td>
-                          <td className="py-3 px-4">
-                            <div className="flex items-center justify-end space-x-2">
-                              <button 
-                                onClick={() => handleEdit(post, "blogs")}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                              >
-                                <Edit className="w-4 h-4 text-blue-600" />
-                              </button>
-                              <button 
-                                onClick={() => handleDelete(post.id, "blogs")}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                              >
-                                <Trash2 className="w-4 h-4 text-red-600" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
                 </div>
               )}
             </div>
@@ -728,48 +1117,50 @@ export default function AdminDashboard() {
 
           {/* Testimonials Management */}
           {activeTab === "testimonials" && (
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
               {loading ? (
                 <div className="flex justify-center py-12">
                   <Loader2 className="w-8 h-8 animate-spin text-[#D4AF37]" />
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-200">
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Name</th>
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Role</th>
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Rating</th>
-                        <th className="text-right py-3 px-4 font-semibold text-gray-700">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {testimonials.map((testimonial) => (
-                        <tr key={testimonial.id} className="border-b border-gray-100 hover:bg-gray-50">
-                          <td className="py-3 px-4">{testimonial.name}</td>
-                          <td className="py-3 px-4">{testimonial.role}</td>
-                          <td className="py-3 px-4">{"⭐".repeat(testimonial.rating)}</td>
-                          <td className="py-3 px-4">
-                            <div className="flex items-center justify-end space-x-2">
-                              <button 
-                                onClick={() => handleEdit(testimonial, "testimonials")}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                              >
-                                <Edit className="w-4 h-4 text-blue-600" />
-                              </button>
-                              <button 
-                                onClick={() => handleDelete(testimonial.id, "testimonials")}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                              >
-                                <Trash2 className="w-4 h-4 text-red-600" />
-                              </button>
-                            </div>
-                          </td>
+                <div className="overflow-x-auto -mx-4 md:mx-0">
+                  <div className="inline-block min-w-full align-middle">
+                    <table className="min-w-full">
+                      <thead>
+                        <tr className="border-b border-gray-200">
+                          <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Name</th>
+                          <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Role</th>
+                          <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Rating</th>
+                          <th className="text-right py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base whitespace-nowrap">Actions</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {testimonials.map((testimonial) => (
+                          <tr key={testimonial.id} className="border-b border-gray-100 hover:bg-gray-50">
+                            <td className="py-3 px-3 md:px-4 text-sm md:text-base">{testimonial.name}</td>
+                            <td className="py-3 px-3 md:px-4 text-sm md:text-base">{testimonial.role}</td>
+                            <td className="py-3 px-3 md:px-4 text-sm md:text-base">{"⭐".repeat(testimonial.rating)}</td>
+                            <td className="py-3 px-3 md:px-4">
+                              <div className="flex items-center justify-end space-x-1 md:space-x-2">
+                                <button 
+                                  onClick={() => handleEdit(testimonial, "testimonials")}
+                                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                >
+                                  <Edit className="w-4 h-4 text-blue-600" />
+                                </button>
+                                <button 
+                                  onClick={() => handleDelete(testimonial.id, "testimonials")}
+                                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                >
+                                  <Trash2 className="w-4 h-4 text-red-600" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )}
             </div>
@@ -777,46 +1168,48 @@ export default function AdminDashboard() {
 
           {/* Partners Management */}
           {activeTab === "partners" && (
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
               {loading ? (
                 <div className="flex justify-center py-12">
                   <Loader2 className="w-8 h-8 animate-spin text-[#D4AF37]" />
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-200">
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Name</th>
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Website</th>
-                        <th className="text-right py-3 px-4 font-semibold text-gray-700">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {partners.map((partner) => (
-                        <tr key={partner.id} className="border-b border-gray-100 hover:bg-gray-50">
-                          <td className="py-3 px-4">{partner.name}</td>
-                          <td className="py-3 px-4">{partner.website || "N/A"}</td>
-                          <td className="py-3 px-4">
-                            <div className="flex items-center justify-end space-x-2">
-                              <button 
-                                onClick={() => handleEdit(partner, "partners")}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                              >
-                                <Edit className="w-4 h-4 text-blue-600" />
-                              </button>
-                              <button 
-                                onClick={() => handleDelete(partner.id, "partners")}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                              >
-                                <Trash2 className="w-4 h-4 text-red-600" />
-                              </button>
-                            </div>
-                          </td>
+                <div className="overflow-x-auto -mx-4 md:mx-0">
+                  <div className="inline-block min-w-full align-middle">
+                    <table className="min-w-full">
+                      <thead>
+                        <tr className="border-b border-gray-200">
+                          <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Name</th>
+                          <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Website</th>
+                          <th className="text-right py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base whitespace-nowrap">Actions</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {partners.map((partner) => (
+                          <tr key={partner.id} className="border-b border-gray-100 hover:bg-gray-50">
+                            <td className="py-3 px-3 md:px-4 text-sm md:text-base">{partner.name}</td>
+                            <td className="py-3 px-3 md:px-4 text-sm md:text-base">{partner.website || "N/A"}</td>
+                            <td className="py-3 px-3 md:px-4">
+                              <div className="flex items-center justify-end space-x-1 md:space-x-2">
+                                <button 
+                                  onClick={() => handleEdit(partner, "partners")}
+                                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                >
+                                  <Edit className="w-4 h-4 text-blue-600" />
+                                </button>
+                                <button 
+                                  onClick={() => handleDelete(partner.id, "partners")}
+                                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                >
+                                  <Trash2 className="w-4 h-4 text-red-600" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )}
             </div>
@@ -824,83 +1217,87 @@ export default function AdminDashboard() {
 
           {/* Bookings Management */}
           {activeTab === "bookings" && (
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
               {loading ? (
                 <div className="flex justify-center py-12">
                   <Loader2 className="w-8 h-8 animate-spin text-[#D4AF37]" />
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-200">
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Name</th>
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Email</th>
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Phone</th>
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Date & Time</th>
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Property Type</th>
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
-                        <th className="text-right py-3 px-4 font-semibold text-gray-700">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {bookings.map((booking) => (
-                        <tr key={booking.id} className="border-b border-gray-100 hover:bg-gray-50">
-                          <td className="py-3 px-4">
-                            <div className="flex items-center gap-2">
-                              {booking.name}
-                              {booking.googleCalendarEventId && (
-                                  <CalendarCheck className="w-4 h-4 text-green-600" role="img" aria-label="Google Calendar event created" />
-                                )}
-                            </div>
-                          </td>
-                          <td className="py-3 px-4 text-sm">{booking.email}</td>
-                          <td className="py-3 px-4 text-sm">{booking.phone}</td>
-                          <td className="py-3 px-4 text-sm">
-                            <div>{booking.date}</div>
-                            <div className="text-gray-500">{booking.time}</div>
-                          </td>
-                          <td className="py-3 px-4 text-sm">{booking.propertyType || 'N/A'}</td>
-                          <td className="py-3 px-4">
-                            <select
-                              value={booking.status}
-                              onChange={(e) => handleUpdateBookingStatus(booking.id, e.target.value)}
-                              className={`px-3 py-1 rounded-full text-xs font-semibold border-none ${
-                                booking.status === 'Confirmed' 
-                                  ? 'bg-green-100 text-green-800' 
-                                  : booking.status === 'Pending'
-                                  ? 'bg-yellow-100 text-yellow-800'
-                                  : booking.status === 'Completed'
-                                  ? 'bg-blue-100 text-blue-800'
-                                  : 'bg-gray-100 text-gray-800'
-                              }`}
-                            >
-                              <option value="Pending">Pending</option>
-                              <option value="Confirmed">Confirmed</option>
-                              <option value="Completed">Completed</option>
-                              <option value="Cancelled">Cancelled</option>
-                            </select>
-                          </td>
-                          <td className="py-3 px-4">
-                            <div className="flex items-center justify-end space-x-2">
-                              <button 
-                                onClick={() => handleEdit(booking, "bookings")}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                              >
-                                <Edit className="w-4 h-4 text-blue-600" />
-                              </button>
-                              <button 
-                                onClick={() => handleDelete(booking.id, "bookings")}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                              >
-                                <Trash2 className="w-4 h-4 text-red-600" />
-                              </button>
-                            </div>
-                          </td>
+                <div className="overflow-x-auto -mx-4 md:mx-0">
+                  <div className="inline-block min-w-full align-middle">
+                    <table className="min-w-full">
+                      <thead>
+                        <tr className="border-b border-gray-200">
+                          <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Name</th>
+                          <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Email</th>
+                          <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Phone</th>
+                          <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base whitespace-nowrap">Date & Time</th>
+                          <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base whitespace-nowrap">Property Type</th>
+                          <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Status</th>
+                          <th className="text-right py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base whitespace-nowrap">Actions</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {bookings.map((booking) => (
+                          <tr key={booking.id} className="border-b border-gray-100 hover:bg-gray-50">
+                            <td className="py-3 px-3 md:px-4 text-sm md:text-base">
+                              <div className="flex items-center gap-2">
+                                {booking.name}
+                                {booking.googleCalendarEventId && (
+                                  <div title="Google Calendar event created">
+                                    <CalendarCheck className="w-4 h-4 text-green-600" />
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                            <td className="py-3 px-3 md:px-4 text-xs md:text-sm break-all">{booking.email}</td>
+                            <td className="py-3 px-3 md:px-4 text-xs md:text-sm whitespace-nowrap">{booking.phone}</td>
+                            <td className="py-3 px-3 md:px-4 text-xs md:text-sm">
+                              <div>{booking.date}</div>
+                              <div className="text-gray-500">{booking.time}</div>
+                            </td>
+                            <td className="py-3 px-3 md:px-4 text-xs md:text-sm">{booking.propertyType || 'N/A'}</td>
+                            <td className="py-3 px-3 md:px-4">
+                              <select
+                                value={booking.status}
+                                onChange={(e) => handleUpdateBookingStatus(booking.id, e.target.value)}
+                                className={`px-2 md:px-3 py-1 rounded-full text-xs font-semibold border-none ${
+                                  booking.status === 'Confirmed' 
+                                    ? 'bg-green-100 text-green-800' 
+                                    : booking.status === 'Pending'
+                                    ? 'bg-yellow-100 text-yellow-800'
+                                    : booking.status === 'Completed'
+                                    ? 'bg-blue-100 text-blue-800'
+                                    : 'bg-gray-100 text-gray-800'
+                                }`}
+                              >
+                                <option value="Pending">Pending</option>
+                                <option value="Confirmed">Confirmed</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Cancelled">Cancelled</option>
+                              </select>
+                            </td>
+                            <td className="py-3 px-3 md:px-4">
+                              <div className="flex items-center justify-end space-x-1 md:space-x-2">
+                                <button 
+                                  onClick={() => handleEdit(booking, "bookings")}
+                                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                >
+                                  <Edit className="w-4 h-4 text-blue-600" />
+                                </button>
+                                <button 
+                                  onClick={() => handleDelete(booking.id, "bookings")}
+                                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                >
+                                  <Trash2 className="w-4 h-4 text-red-600" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )}
             </div>
@@ -908,63 +1305,65 @@ export default function AdminDashboard() {
 
           {/* Contacts Management */}
           {activeTab === "contacts" && (
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
               {loading ? (
                 <div className="flex justify-center py-12">
                   <Loader2 className="w-8 h-8 animate-spin text-[#D4AF37]" />
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-200">
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Name</th>
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Email</th>
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Phone</th>
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Subject</th>
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
-                        <th className="text-right py-3 px-4 font-semibold text-gray-700">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {contacts.map((contact) => (
-                        <tr key={contact.id} className="border-b border-gray-100 hover:bg-gray-50">
-                          <td className="py-3 px-4">{contact.name}</td>
-                          <td className="py-3 px-4">{contact.email}</td>
-                          <td className="py-3 px-4">{contact.phone}</td>
-                          <td className="py-3 px-4">{contact.subject}</td>
-                          <td className="py-3 px-4">
-                            <select
-                              value={contact.status}
-                              onChange={(e) => handleUpdateContactStatus(contact.id, e.target.value)}
-                              className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 border-none"
-                            >
-                              <option value="Unread">Unread</option>
-                              <option value="Read">Read</option>
-                              <option value="Responded">Responded</option>
-                            </select>
-                          </td>
-                          <td className="py-3 px-4">
-                            <div className="flex items-center justify-end space-x-2">
-                              <button 
-                                onClick={() => handleViewMessage(contact.message)}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                                title="View message"
-                              >
-                                <Eye className="w-4 h-4 text-gray-600" />
-                              </button>
-                              <button 
-                                onClick={() => handleDelete(contact.id, "contacts")}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                              >
-                                <Trash2 className="w-4 h-4 text-red-600" />
-                              </button>
-                            </div>
-                          </td>
+                <div className="overflow-x-auto -mx-4 md:mx-0">
+                  <div className="inline-block min-w-full align-middle">
+                    <table className="min-w-full">
+                      <thead>
+                        <tr className="border-b border-gray-200">
+                          <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Name</th>
+                          <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Email</th>
+                          <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Phone</th>
+                          <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Subject</th>
+                          <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Status</th>
+                          <th className="text-right py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base whitespace-nowrap">Actions</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {contacts.map((contact) => (
+                          <tr key={contact.id} className="border-b border-gray-100 hover:bg-gray-50">
+                            <td className="py-3 px-3 md:px-4 text-sm md:text-base">{contact.name}</td>
+                            <td className="py-3 px-3 md:px-4 text-xs md:text-sm break-all">{contact.email}</td>
+                            <td className="py-3 px-3 md:px-4 text-xs md:text-sm whitespace-nowrap">{contact.phone}</td>
+                            <td className="py-3 px-3 md:px-4 text-sm md:text-base">{contact.subject}</td>
+                            <td className="py-3 px-3 md:px-4">
+                              <select
+                                value={contact.status}
+                                onChange={(e) => handleUpdateContactStatus(contact.id, e.target.value)}
+                                className="px-2 md:px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 border-none"
+                              >
+                                <option value="Unread">Unread</option>
+                                <option value="Read">Read</option>
+                                <option value="Responded">Responded</option>
+                              </select>
+                            </td>
+                            <td className="py-3 px-3 md:px-4">
+                              <div className="flex items-center justify-end space-x-1 md:space-x-2">
+                                <button 
+                                  onClick={() => handleViewMessage(contact.message)}
+                                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                  title="View message"
+                                >
+                                  <Eye className="w-4 h-4 text-gray-600" />
+                                </button>
+                                <button 
+                                  onClick={() => handleDelete(contact.id, "contacts")}
+                                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                >
+                                  <Trash2 className="w-4 h-4 text-red-600" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )}
             </div>
@@ -972,56 +1371,58 @@ export default function AdminDashboard() {
 
           {/* FAQs Management */}
           {activeTab === "faqs" && (
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
               {loading ? (
                 <div className="flex justify-center py-12">
                   <Loader2 className="w-8 h-8 animate-spin text-[#D4AF37]" />
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-200">
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Question</th>
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Category</th>
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
-                        <th className="text-right py-3 px-4 font-semibold text-gray-700">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {faqs.map((faq) => (
-                        <tr key={faq.id} className="border-b border-gray-100 hover:bg-gray-50">
-                          <td className="py-3 px-4">{faq.question}</td>
-                          <td className="py-3 px-4">{faq.category}</td>
-                          <td className="py-3 px-4">
-                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                              faq.published 
-                                ? "bg-green-100 text-green-800" 
-                                : "bg-gray-100 text-gray-800"
-                            }`}>
-                              {faq.published ? "Published" : "Draft"}
-                            </span>
-                          </td>
-                          <td className="py-3 px-4">
-                            <div className="flex items-center justify-end space-x-2">
-                              <button 
-                                onClick={() => handleEdit(faq, "faqs")}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                              >
-                                <Edit className="w-4 h-4 text-blue-600" />
-                              </button>
-                              <button 
-                                onClick={() => handleDelete(faq.id, "faqs")}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                              >
-                                <Trash2 className="w-4 h-4 text-red-600" />
-                              </button>
-                            </div>
-                          </td>
+                <div className="overflow-x-auto -mx-4 md:mx-0">
+                  <div className="inline-block min-w-full align-middle">
+                    <table className="min-w-full">
+                      <thead>
+                        <tr className="border-b border-gray-200">
+                          <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Question</th>
+                          <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Category</th>
+                          <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Status</th>
+                          <th className="text-right py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base whitespace-nowrap">Actions</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {faqs.map((faq) => (
+                          <tr key={faq.id} className="border-b border-gray-100 hover:bg-gray-50">
+                            <td className="py-3 px-3 md:px-4 text-sm md:text-base">{faq.question}</td>
+                            <td className="py-3 px-3 md:px-4 text-sm md:text-base">{faq.category}</td>
+                            <td className="py-3 px-3 md:px-4">
+                              <span className={`px-2 md:px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${
+                                faq.published 
+                                  ? "bg-green-100 text-green-800" 
+                                  : "bg-gray-100 text-gray-800"
+                              }`}>
+                                {faq.published ? "Published" : "Draft"}
+                              </span>
+                            </td>
+                            <td className="py-3 px-3 md:px-4">
+                              <div className="flex items-center justify-end space-x-1 md:space-x-2">
+                                <button 
+                                  onClick={() => handleEdit(faq, "faqs")}
+                                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                >
+                                  <Edit className="w-4 h-4 text-blue-600" />
+                                </button>
+                                <button 
+                                  onClick={() => handleDelete(faq.id, "faqs")}
+                                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                >
+                                  <Trash2 className="w-4 h-4 text-red-600" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )}
             </div>
@@ -1029,33 +1430,33 @@ export default function AdminDashboard() {
 
           {/* Gallery Management */}
           {activeTab === "gallery" && (
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
               {loading ? (
                 <div className="flex justify-center py-12">
                   <Loader2 className="w-8 h-8 animate-spin text-[#D4AF37]" />
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                   {galleryItems.map((item) => (
                     <div key={item.id} className="bg-gray-50 rounded-lg overflow-hidden">
                       <img 
                         src={item.image} 
                         alt={item.title}
-                        className="w-full h-48 object-cover"
+                        className="w-full h-40 md:h-48 object-cover"
                       />
                       <div className="p-4">
-                        <h3 className="font-semibold mb-2">{item.title}</h3>
-                        <p className="text-sm text-gray-600 mb-3">{item.category}</p>
+                        <h3 className="font-semibold mb-2 text-sm md:text-base">{item.title}</h3>
+                        <p className="text-xs md:text-sm text-gray-600 mb-3">{item.category}</p>
                         <div className="flex space-x-2">
                           <button 
                             onClick={() => handleEdit(item, "gallery")}
-                            className="text-blue-600 text-sm hover:underline"
+                            className="text-blue-600 text-xs md:text-sm hover:underline"
                           >
                             Edit
                           </button>
                           <button 
                             onClick={() => handleDelete(item.id, "gallery")}
-                            className="text-red-600 text-sm hover:underline"
+                            className="text-red-600 text-xs md:text-sm hover:underline"
                           >
                             Delete
                           </button>
@@ -1073,9 +1474,9 @@ export default function AdminDashboard() {
       {/* Edit/Add Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-              <h2 className="font-display text-2xl font-bold text-[#1a2332]">
+          <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-4 md:p-6 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
+              <h2 className="font-display text-xl md:text-2xl font-bold text-[#1a2332]">
                 {editType === "view-message" 
                   ? "View Message" 
                   : isCreating 
@@ -1094,10 +1495,10 @@ export default function AdminDashboard() {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="p-6">
+            <div className="p-4 md:p-6">
               {editType === "view-message" ? (
                 <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-gray-800 whitespace-pre-wrap">{editingItem?.message}</p>
+                  <p className="text-gray-800 whitespace-pre-wrap text-sm md:text-base">{editingItem?.message}</p>
                 </div>
               ) : (
                 <EditForm 

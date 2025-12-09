@@ -49,6 +49,8 @@
     "@tsparticles/engine": "^3.8.1",
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": "^3.8.1",
+    "@types/bcrypt": "^6.0.0",
+    "bcrypt": "^6.0.0",
     "bcryptjs": "^2.4.3",
     "better-auth": "^1.4.1",
     "class-variance-authority": "^0.7.1",

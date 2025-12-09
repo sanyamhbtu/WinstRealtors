@@ -6,7 +6,6 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
-import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 
 export default function LoginPage() {
@@ -19,37 +18,48 @@ export default function LoginPage() {
     rememberMe: false,
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
 
-    try {
-      const { data, error } = await authClient.signIn.email({
+  try {
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
         email: formData.email,
-        password: formData.password,
-        rememberMe: formData.rememberMe,
-      });
-
-      if (error?.code) {
-        toast.error("Invalid email or password. Please make sure you have already registered an account and try again.");
-        setLoading(false);
-        return;
-      }
-
-      toast.success("Login successful! Redirecting...");
-      
-      // Get redirect URL from query params or default to home
-      const searchParams = new URLSearchParams(window.location.search);
-      const redirect = searchParams.get("redirect") || "/adminstration/admin";
-      
-      setTimeout(() => {
-        router.push(redirect);
-      }, 1000);
-    } catch (error) {
-      toast.error("An unexpected error occurred");
+        password: formData.password
+      })
+    });
+    if (!res.ok) {
+      toast.error("Invalid email or password");
       setLoading(false);
+      return;
     }
-  };
+
+    const authToken = res.headers.get("auth-token");
+    if (authToken) {
+      localStorage.setItem("bearer_token", authToken);
+    }
+
+    toast.success("Login successful! Redirecting...");
+
+    const searchParams = new URLSearchParams(window.location.search);
+    const redirect = searchParams.get("redirect") || "/adminstration/admin";
+
+    setTimeout(() => {
+      router.push(redirect);
+    }, 1000);
+
+  } catch (error) {
+    toast.error("An unexpected error occurred");
+  }
+
+  setLoading(false);
+};
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;

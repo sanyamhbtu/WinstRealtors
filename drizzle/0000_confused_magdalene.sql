@@ -154,3 +154,12 @@ CREATE TABLE `verification` (
 	`created_at` integer,
 	`updated_at` integer
 );
+
+CREATE TABLE `admin_emails` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`email` text NOT NULL,
+	`added_by` text NOT NULL,
+	`created_at` text NOT NULL,
+	`updated_at` text NOT NULL
+);
+CREATE UNIQUE INDEX `admin_emails_email_unique` ON `admin_emails` (`email`);

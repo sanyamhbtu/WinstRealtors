@@ -13,8 +13,7 @@ export const authClient = createAuthClient({
           // Store the token securely (e.g., in localStorage)
           if(authToken){
             // Split token at "." and take only the first part
-            const tokenPart = authToken.includes('.') ? authToken.split('.')[0] : authToken;
-            localStorage.setItem("bearer_token", tokenPart);
+            localStorage.setItem("bearer_token", authToken);
           }
       }
   }

@@ -114,6 +114,14 @@ export const galleryItems = sqliteTable('gallery_items', {
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
 });
+// Admin emails table
+export const adminEmails = sqliteTable('admin_emails', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  email: text('email').notNull().unique(),
+  addedBy: text('added_by').notNull(),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
 
 
 // Auth tables for better-auth
