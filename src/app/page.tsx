@@ -203,10 +203,10 @@ export default function Home() {
                   className="px-4 py-3 rounded-lg border border-gray-300 text-[#1a2332] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
                 >
                   <option>Price Range</option>
-                  <option>$0 - $5M</option>
-                  <option>$5M - $10M</option>
-                  <option>$10M - $20M</option>
-                  <option>$20M+</option>
+                  <option>₹0 - ₹1L</option>
+                  <option>₹1L - ₹5L</option>
+                  <option>₹5L - ₹10L</option>
+                  <option>₹10L+</option>
                 </select>
               </div>
               <Button 
@@ -338,10 +338,10 @@ export default function Home() {
                 Excellence in Luxury Real Estate
               </h2>
               <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-                With over 25 years of experience, Winst Realtors has established itself as the premier destination for luxury real estate. Our team of expert consultants provides personalized service to discerning clients worldwide.
+                WINST Realtors has quickly become a trusted name in modern real estate, offering clear guidance and personalized support to help clients make confident property decisions. Our experienced team is committed to delivering a seamless and refined experience at every step.
               </p>
               <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                We specialize in exclusive properties that represent the pinnacle of architectural design, prime locations, and exceptional value. From oceanfront estates to urban penthouses, we curate the finest selection of luxury real estate.
+                We specialize in verified residential and commercial properties across prime locations, curating opportunities that combine value, convenience, and long-term growth. Whether buying, selling, or investing, we provide dependable solutions shaped around your goals.
               </p>
               <Button
                 asChild
