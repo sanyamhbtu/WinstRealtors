@@ -189,11 +189,12 @@ const handleSubmit = async (e: React.FormEvent) => {
       {/* Right Side - Image */}
       <div className="hidden lg:block lg:flex-1 relative">
         <Image
-          src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/project-uploads/43b9d188-159a-4035-ab5b-2097544eaef3/generated_images/ultra-luxury-modern-mansion-exterior-con-d9c1a564-20251121133418.jpg"
+          src="https://res.cloudinary.com/dxxielg5u/image/upload/v1765513858/8_twoyxg.jpg"
           alt="Luxury Property"
           fill
           className="object-cover"
         />
+        
         <div className="absolute inset-0 bg-gradient-to-br from-[#1a2332]/90 to-[#1a2332]/70" />
         <div className="absolute inset-0 flex items-center justify-center text-white p-12">
           <div className="max-w-lg text-center">

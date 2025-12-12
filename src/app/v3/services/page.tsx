@@ -135,7 +135,7 @@ const process = [
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/project-uploads/43b9d188-159a-4035-ab5b-2097544eaef3/generated_images/sophisticated-luxury-real-estate-office--14854e03-20251121133417.jpg"
+            src="https://res.cloudinary.com/dxxielg5u/image/upload/v1765512137/2_gpzwys.jpg"
             alt="Our Services"
             fill
             className="object-cover"
@@ -265,7 +265,7 @@ const process = [
 
             <div className="relative h-[500px] rounded-lg overflow-hidden shadow-2xl">
               <Image
-                src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/project-uploads/43b9d188-159a-4035-ab5b-2097544eaef3/generated_images/elegant-luxury-penthouse-interior-modern-47fc35ea-20251121133417.jpg"
+                src="https://res.cloudinary.com/dxxielg5u/image/upload/v1765512423/3_rh0wih.png"
                 alt="Investment Consulting"
                 fill
                 className="object-cover"

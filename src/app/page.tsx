@@ -326,7 +326,7 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="relative h-[500px] rounded-lg overflow-hidden">
               <Image
-                src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/project-uploads/43b9d188-159a-4035-ab5b-2097544eaef3/generated_images/sophisticated-luxury-real-estate-office--14854e03-20251121133417.jpg"
+                src="https://res.cloudinary.com/dxxielg5u/image/upload/v1765511859/1_xvoexa.png"
                 alt="About Winst Realtors"
                 fill
                 className="object-cover"

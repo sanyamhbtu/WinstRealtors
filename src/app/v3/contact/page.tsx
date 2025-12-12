@@ -43,10 +43,10 @@ export default function ContactPage() {
       <section className="relative h-[50vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/project-uploads/43b9d188-159a-4035-ab5b-2097544eaef3/generated_images/sophisticated-luxury-real-estate-office--14854e03-20251121133417.jpg"
+            src="https://res.cloudinary.com/dxxielg5u/image/upload/v1765512814/5_nepnph.jpg"
             alt="Contact Us"
             fill
-            className="object-cover"
+            className="object"
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#1a2332]/95 to-[#1a2332]/70" />
