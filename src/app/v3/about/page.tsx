@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Award, Users, Globe, TrendingUp, Shield, Heart } from "lucide-react";
+import { ArrowRight, Award, Users, Globe, TrendingUp, Shield, Heart, Zap } from "lucide-react";
 
 export default function AboutPage() {
   const team = [
@@ -48,33 +48,33 @@ export default function AboutPage() {
   const values = [
     {
       icon: Award,
-      title: "Excellence",
-      description: "Delivering exceptional service and results that exceed expectations in every transaction.",
+      title: "Professionalism",
+      description: "Timely service with complete responsibility",
     },
     {
       icon: Shield,
       title: "Integrity",
-      description: "Maintaining the highest ethical standards with transparency and honesty in all our dealings.",
+      description: "Honest and transparent deals",
     },
     {
       icon: Users,
-      title: "Client-Focused",
-      description: "Putting our clients' needs first and building lasting relationships based on trust.",
+      title: "Customer First",
+      description: "Personalized guidance and dedicated support",
     },
     {
-      icon: Globe,
-      title: "Global Reach",
-      description: "Leveraging an extensive international network to serve clients worldwide.",
+      icon: Zap,
+      title: "Innovation",
+      description: "Embracing smart tools and fresh ideas to simplify every transaction.",
     },
     {
       icon: TrendingUp,
-      title: "Market Expertise",
-      description: "Deep knowledge of luxury markets and trends to maximize property values.",
+      title: "Growth",
+      description: "Creating long-term value for clients and investors",
     },
     {
       icon: Heart,
-      title: "Passion",
-      description: "A genuine love for luxury real estate and helping clients find their perfect property.",
+      title: "Quality",
+      description: " Verified listings and accurate information",
     },
   ];
 
@@ -98,7 +98,7 @@ export default function AboutPage() {
             Excellence in Luxury Real Estate
           </h1>
           <p className="text-xl md:text-2xl text-gray-200 leading-relaxed">
-            Since 1998, we've been the trusted partner for discerning clients seeking exceptional properties worldwide
+            Since 2025, we've been the trusted partner for discerning clients seeking exceptional properties worldwide
           </p>
         </div>
       </section>
@@ -113,13 +113,13 @@ export default function AboutPage() {
               </h2>
               <div className="space-y-4 text-lg text-gray-600 leading-relaxed">
                 <p>
-                  Founded in 1998 by Victoria Sterling, Winst Realtors began with a simple vision: to redefine luxury real estate through exceptional service, unparalleled market knowledge, and unwavering dedication to our clients.
+                  WINST Realtors Pvt. Ltd., founded in 2025 by Mr. Jagdish Saini, began with a clear purpose: to simplify the real estate experience for buyers, sellers, and investors. What started as a vision soon transformed into a trusted name built on transparency and commitment.
                 </p>
                 <p>
-                  Over the past 25 years, we've grown from a boutique agency to one of the world's most respected luxury real estate firms, with a portfolio exceeding $4.2 billion in sales and a presence in major markets across the globe.
+                  From offering residential and commercial services, the company quickly earned a reputation for professional guidance and smooth, hassle-free property transactions. Clients appreciated the clarity, support, and confidence WINST brought to every step of the process.
                 </p>
                 <p>
-                  Our success is built on relationships. We take the time to understand each client's unique needs, aspirations, and lifestyle to deliver personalized solutions that exceed expectations. Whether you're buying your dream home, selling a cherished property, or building an investment portfolio, we're committed to making your real estate journey exceptional.
+                  Today, WINST Realtors continues to expand with a strong network, a skilled team, and a customer-centric approach at its core. With every project, the company stays dedicated to delivering reliable service and shaping a better real estate journey for all.
                 </p>
               </div>
             </div>
@@ -141,15 +141,15 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="font-display text-5xl font-bold text-[#D4AF37] mb-2">25+</div>
+              <div className="font-display text-5xl font-bold text-[#D4AF37] mb-2">2+</div>
               <div className="text-gray-300">Years Experience</div>
             </div>
             <div className="text-center">
-              <div className="font-display text-5xl font-bold text-[#D4AF37] mb-2">2,500+</div>
+              <div className="font-display text-5xl font-bold text-[#D4AF37] mb-2">25+</div>
               <div className="text-gray-300">Properties Sold</div>
             </div>
             <div className="text-center">
-              <div className="font-display text-5xl font-bold text-[#D4AF37] mb-2">$4.2B+</div>
+              <div className="font-display text-5xl font-bold text-[#D4AF37] mb-2">₹42L+</div>
               <div className="text-gray-300">Total Sales</div>
             </div>
             <div className="text-center">
@@ -247,9 +247,9 @@ export default function AboutPage() {
                     <Award className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-display text-xl font-semibold mb-2">Proven Track Record</h3>
+                    <h3 className="font-display text-xl font-semibold mb-2">Proven Trust & Transparency</h3>
                     <p className="text-gray-300">
-                      Over 25 years of excellence with billions in successful transactions and countless satisfied clients.
+                      Known for honest deals, reliable documentation, and smooth property transactions.
                     </p>
                   </div>
                 </div>
@@ -258,9 +258,9 @@ export default function AboutPage() {
                     <Globe className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-display text-xl font-semibold mb-2">Global Network</h3>
+                    <h3 className="font-display text-xl font-semibold mb-2">Strong Local Network</h3>
                     <p className="text-gray-300">
-                      Access to exclusive listings worldwide through our extensive network of luxury real estate partners.
+                      Offering a growing range of verified residential and commercial properties across prime locations.
                     </p>
                   </div>
                 </div>
@@ -269,9 +269,9 @@ export default function AboutPage() {
                     <Users className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-display text-xl font-semibold mb-2">Expert Team</h3>
+                    <h3 className="font-display text-xl font-semibold mb-2">Dedicated & Professional Team</h3>
                     <p className="text-gray-300">
-                      Industry-leading professionals with deep market knowledge and negotiation expertise.
+                      Skilled experts providing personalized guidance, timely service, and accurate market insights.
                     </p>
                   </div>
                 </div>

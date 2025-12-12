@@ -29,26 +29,12 @@ export default function ContactPage() {
 
   const offices = [
     {
-      city: "New York",
-      address: "123 Luxury Boulevard, Manhattan, NY 10001",
-      phone: "+1 (212) 555-1234",
-      email: "newyork@winstrealtors.com",
-      hours: "Mon-Fri: 9:00 AM - 6:00 PM",
-    },
-    {
-      city: "Los Angeles",
-      address: "456 Sunset Drive, Beverly Hills, CA 90210",
-      phone: "+1 (310) 555-5678",
-      email: "losangeles@winstrealtors.com",
-      hours: "Mon-Fri: 9:00 AM - 6:00 PM",
-    },
-    {
-      city: "Miami",
-      address: "789 Ocean Avenue, Miami Beach, FL 33139",
-      phone: "+1 (305) 555-9012",
-      email: "miami@winstrealtors.com",
-      hours: "Mon-Fri: 9:00 AM - 6:00 PM",
-    },
+      city: "Meerut",
+      address: "The Galleria Square, 26, Harsh Commercial Park,  Garh Road Meerut, near Vivan Hospital  Meerut Uttar Pradesh, India",
+      phone: "+91 96343 96117, +91 81301 84250",
+      email: "sales@winstrealtors.com",
+      hours: "Mon-Sun: 10:00 AM - 7:00 PM",
+    }
   ];
 
   return (
@@ -99,7 +85,7 @@ export default function ContactPage() {
                         value={formData.name}
                         onChange={handleChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
-                        placeholder="John Doe"
+                        placeholder="Rahul Gupta"
                       />
                     </div>
                     <div>
@@ -113,7 +99,7 @@ export default function ContactPage() {
                         value={formData.email}
                         onChange={handleChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
-                        placeholder="john@example.com"
+                        placeholder="rahul@example.com"
                       />
                     </div>
                   </div>
@@ -129,7 +115,7 @@ export default function ContactPage() {
                         value={formData.phone}
                         onChange={handleChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
-                        placeholder="+1 (555) 000-0000"
+                        placeholder="+91 0000000000"
                       />
                     </div>
                     <div>
@@ -192,10 +178,10 @@ export default function ContactPage() {
                       <MapPin className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-[#1a2332] mb-1">Headquarters</h4>
+                      <h4 className="font-semibold text-[#1a2332] mb-1">Main Office</h4>
                       <p className="text-gray-600">
-                        123 Luxury Boulevard<br />
-                        Downtown, New York, NY 10001
+                        26, Harsh Commercial Park,  Garh Road<br />
+                        near Vivan Hospital  Meerut Uttar Pradesh
                       </p>
                     </div>
                   </div>
@@ -206,8 +192,11 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h4 className="font-semibold text-[#1a2332] mb-1">Phone</h4>
-                      <a href="tel:+12125551234" className="text-gray-600 hover:text-[#D4AF37]">
-                        +1 (212) 555-1234
+                      <a href="tel:+919634396117" className="text-gray-600 hover:text-[#D4AF37]">
+                        +91 96343 96117
+                      </a> <br />
+                      <a href="tel:+918130184250" className="text-gray-600 hover:text-[#D4AF37]">
+                        +91 81301 84250
                       </a>
                     </div>
                   </div>
@@ -218,8 +207,8 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h4 className="font-semibold text-[#1a2332] mb-1">Email</h4>
-                      <a href="mailto:info@winstrealtors.com" className="text-gray-600 hover:text-[#D4AF37]">
-                        info@winstrealtors.com
+                      <a href="mailto:sales@winstrealtors.com" className="text-gray-600 hover:text-[#D4AF37]">
+                        sales@winstrealtors.com
                       </a>
                     </div>
                   </div>
@@ -231,9 +220,7 @@ export default function ContactPage() {
                     <div>
                       <h4 className="font-semibold text-[#1a2332] mb-1">Business Hours</h4>
                       <p className="text-gray-600">
-                        Monday - Friday: 9:00 AM - 6:00 PM<br />
-                        Saturday: 10:00 AM - 4:00 PM<br />
-                        Sunday: Closed
+                        Monday - Sunday: 10:00 AM - 7:00 PM
                       </p>
                     </div>
                   </div>
@@ -261,14 +248,17 @@ export default function ContactPage() {
 
       {/* Map Section */}
       <section className="h-[500px] bg-gray-200">
-        <div className="w-full h-full flex items-center justify-center">
-          <div className="text-center">
-            <MapPin className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 text-lg font-semibold">Interactive Map</p>
-            <p className="text-gray-500 text-sm mt-2">Google Maps integration would be embedded here</p>
-          </div>
+          <div className="w-full h-full">
+            <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3490.8156366116714!2d77.7446633!3d28.9631923!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390c6586b5ee5f63%3A0x6213ea614be3dffa!2sInstaa%20Office!5e0!3m2!1sen!2sin!4v1765501679109!5m2!1sen!2sin"
+            className="w-full h-full border-0"
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          ></iframe>
         </div>
       </section>
+
 
       {/* Office Locations */}
       <section className="py-20 bg-white">

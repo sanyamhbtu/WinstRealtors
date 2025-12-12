@@ -3,141 +3,131 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { 
   Home, 
-  Building2, 
   TrendingUp, 
-  Calculator,
   FileText,
-  Users,
   Briefcase,
-  Globe,
   ArrowRight,
-  CheckCircle2
+  CheckCircle2,
+  WalletCards,
+  KeyRound,
+  Banknote
 } from "lucide-react";
 
 export default function ServicesPage() {
-  const services = [
-    {
-      icon: Home,
-      title: "Residential Sales",
-      description: "Expert guidance in buying and selling luxury homes, estates, and penthouses with personalized service.",
-      features: [
-        "Property valuation and pricing strategy",
-        "Professional photography and marketing",
-        "Exclusive buyer network access",
-        "Negotiation and closing support"
-      ],
-    },
-    {
-      icon: Building2,
-      title: "Commercial Real Estate",
-      description: "Comprehensive solutions for office buildings, retail spaces, and mixed-use developments.",
-      features: [
-        "Market analysis and feasibility studies",
-        "Tenant representation",
-        "Investment property analysis",
-        "Lease negotiations"
-      ],
-    },
-    {
-      icon: TrendingUp,
-      title: "Investment Consulting",
-      description: "Strategic advice for building and managing profitable real estate investment portfolios.",
-      features: [
-        "ROI analysis and projections",
-        "Portfolio diversification strategies",
-        "Market trend insights",
-        "Risk assessment and mitigation"
-      ],
-    },
-    {
-      icon: Calculator,
-      title: "Property Valuation",
-      description: "Accurate property appraisals using advanced market analysis and comparable sales data.",
-      features: [
-        "Comparative market analysis",
-        "Professional appraisal services",
-        "Investment property evaluation",
-        "Pre-sale pricing strategy"
-      ],
-    },
-    {
-      icon: FileText,
-      title: "Legal & Documentation",
-      description: "Comprehensive support for all legal aspects of real estate transactions.",
-      features: [
-        "Contract review and preparation",
-        "Title search and insurance",
-        "Closing coordination",
-        "Compliance verification"
-      ],
-    },
-    {
-      icon: Users,
-      title: "Relocation Services",
-      description: "Full-service relocation assistance for individuals and corporate clients.",
-      features: [
-        "Area orientation and tours",
-        "School and community information",
-        "Temporary housing solutions",
-        "Moving coordination support"
-      ],
-    },
-    {
-      icon: Briefcase,
-      title: "Property Management",
-      description: "Professional management services to maximize your property's value and returns.",
-      features: [
-        "Tenant screening and placement",
-        "Rent collection and accounting",
-        "Maintenance coordination",
-        "Regular property inspections"
-      ],
-    },
-    {
-      icon: Globe,
-      title: "International Properties",
-      description: "Access to exclusive luxury properties in prime locations worldwide.",
-      features: [
-        "Global network of partners",
-        "International market expertise",
-        "Currency and legal guidance",
-        "Virtual tours and documentation"
-      ],
-    },
-  ];
+const services = [
+  {
+    icon: Home,
+    title: "Property Buying",
+    description: "Simplified property buying with verified options and expert guidance.",
+    features: [
+      "Verified residential & commercial listings",
+      "Property shortlisting support",
+      "Site visits & documentation help",
+      "Negotiation and closing assistance"
+    ],
+  },
+  {
+    icon: WalletCards, 
+    title: "Property Selling",
+    description: "Professional assistance to sell your property quickly and transparently.",
+    features: [
+      "Accurate property valuation",
+      "Marketing & listing support",
+      "Buyer coordination",
+      "Secure documentation handling"
+    ],
+  },
+  {
+    icon: KeyRound,
+    title: "Property Leasing",
+    description: "End-to-end leasing services for both tenants and landlords.",
+    features: [
+      "Rental property listing",
+      "Tenant screening",
+      "Lease agreement assistance",
+      "Move-in coordination"
+    ],
+  },
+  {
+    icon: TrendingUp,
+    title: "Investment Consultancy",
+    description: "Smart, data-driven guidance for profitable real estate investments.",
+    features: [
+      "ROI & risk analysis",
+      "Investment planning",
+      "Market insights",
+      "Portfolio guidance"
+    ],
+  },
+  {
+    icon: Briefcase,
+    title: "Property Management",
+    description: "Reliable management services to maintain and maximize property value.",
+    features: [
+      "Tenant coordination",
+      "Maintenance management",
+      "Rent collection",
+      "Regular inspections"
+    ],
+  },
+  {
+    icon: FileText,
+    title: "Legal Documentation",
+    description: "Complete assistance with legal paperwork for smooth transactions.",
+    features: [
+      "Agreement drafting",
+      "Title verification",
+      "Property registration support",
+      "Compliance checks"
+    ],
+  },
+  {
+    icon: Banknote,
+    title: "Home Loan Assistance",
+    description: "Guidance to help clients secure the right home loan with ease.",
+    features: [
+      "Loan eligibility check",
+      "Documentation support",
+      "Bank partner coordination",
+      "Application guidance"
+    ],
+  },
+];
 
-  const process = [
-    {
-      step: "01",
-      title: "Initial Consultation",
-      description: "We begin with an in-depth conversation to understand your needs, goals, and preferences."
-    },
-    {
-      step: "02",
-      title: "Market Analysis",
-      description: "Our team conducts comprehensive research and analysis to identify the best opportunities."
-    },
-    {
-      step: "03",
-      title: "Property Selection",
-      description: "We curate a selection of properties that match your criteria and arrange exclusive viewings."
-    },
-    {
-      step: "04",
-      title: "Negotiation",
-      description: "Our expert negotiators work to secure the best possible terms and price for your transaction."
-    },
-    {
-      step: "05",
-      title: "Due Diligence",
-      description: "Thorough inspection, verification, and documentation to ensure a smooth transaction."
-    },
-    {
-      step: "06",
-      title: "Closing & Beyond",
-      description: "We manage the closing process and provide ongoing support for all your real estate needs."
-    },
-  ];
+
+const process = [
+  {
+    step: "01",
+    title: "Understanding Your Requirements",
+    description: "We begin by identifying your needs, budget, and preferred property type or service."
+  },
+  {
+    step: "02",
+    title: "Property Search & Shortlisting",
+    description: "Our team finds verified options and shortlists the most suitable properties for you."
+  },
+  {
+    step: "03",
+    title: "Site Visits & Evaluation",
+    description: "We arrange property visits and help you evaluate each option with clarity and confidence."
+  },
+  {
+    step: "04",
+    title: "Negotiation & Finalization",
+    description: "We assist in securing the best price and terms, ensuring a fair and transparent deal."
+  },
+  {
+    step: "05",
+    title: "Legal Documentation",
+    description: "Our team supports agreement drafting, verification, and all required paperwork."
+  },
+  {
+    step: "06",
+    title: "Closing & Assistance",
+    description: "We guide you through the closing process and offer continued support, including loan and move-in help."
+  },
+];
+
 
   return (
     <main className="min-h-screen pt-20">
@@ -247,14 +237,14 @@ export default function ServicesPage() {
                 Investment Consulting
               </h2>
               <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-                Our investment consulting services help you build and manage a profitable real estate portfolio. We provide strategic advice, market analysis, and ongoing support to maximize your returns.
+                Our investment consulting services guide you in making smart and secure real estate decisions. We help identify high-potential opportunities, analyze market trends, and create strategies that support long-term growth.
               </p>
               <ul className="space-y-4 mb-8">
                 {[
-                  "Portfolio diversification strategies",
-                  "Risk assessment and mitigation",
-                  "Market trend analysis and forecasting",
-                  "ROI optimization and tax efficiency"
+                  "Investment planning and opportunity analysis",
+                  "Risk evaluation and smart decision guidance",
+                  "Market insights for better returns",
+                  "ROI improvement and long-term value creation"
                 ].map((item, index) => (
                   <li key={index} className="flex items-center space-x-3">
                     <CheckCircle2 className="w-6 h-6 text-[#D4AF37]" />

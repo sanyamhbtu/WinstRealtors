@@ -12,7 +12,7 @@ export default function Footer() {
           <div className="space-y-6">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-[#D4AF37] to-[#F5E6C8] rounded flex items-center justify-center">
-                <span className="text-[#1a2332] font-display font-bold text-xl">W</span>
+                <img src="https://res.cloudinary.com/dxxielg5u/image/upload/v1764957758/winst-removebg-preview_qancvd.png" alt="Winst Logo" className = "w-15 h-15"/>
               </div>
               <div className="flex flex-col">
                 <span className="font-display text-xl font-bold">
@@ -34,7 +34,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-white/10 hover:bg-[#D4AF37] transition-colors flex items-center justify-center"
               >
-                <Facebook className="w-5 h-5" />
+                <Facebook className="w-5 h-5 " />
               </a>
               <a
                 href="https://instagram.com"
@@ -144,19 +144,19 @@ export default function Footer() {
               <li className="flex items-start space-x-3">
                 <MapPin className="w-5 h-5 text-[#D4AF37] flex-shrink-0 mt-0.5" />
                 <span className="text-gray-400 text-sm">
-                  123 Luxury Boulevard, Downtown<br />New York, NY 10001
+                  The Galleria Square,<br />26, Harsh Commercial Park,  Garh Road Meerut,<br /> near Vivan Hospital Meerut <br /> Uttar Pradesh, India
                 </span>
               </li>
               <li className="flex items-center space-x-3">
                 <Phone className="w-5 h-5 text-[#D4AF37] flex-shrink-0" />
                 <a href="tel:+12125551234" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
-                  +1 (212) 555-1234
+                  +91 96343 96117 , 81301 84250
                 </a>
               </li>
               <li className="flex items-center space-x-3">
                 <Mail className="w-5 h-5 text-[#D4AF37] flex-shrink-0" />
                 <a href="mailto:info@winstrealtors.com" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
-                  info@winstrealtors.com
+                  info@winstrealtors.com , sales@winstrealtors.com
                 </a>
               </li>
             </ul>

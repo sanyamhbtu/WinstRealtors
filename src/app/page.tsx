@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import PropertyCard from "@/components/shared/PropertyCard";
-import { ArrowRight, Building, DollarSign, Star, Award, ChevronLeft, ChevronRight, Search, Loader2 } from "lucide-react";
+import { ArrowRight, Building, DollarSign, Star, Award, ChevronLeft, ChevronRight, Search, Loader2, IndianRupee } from "lucide-react";
 import { toast } from "sonner";
 
 import Navigation from "@/components/shared/Navigation";
@@ -83,7 +83,7 @@ export default function Home() {
             { 
               id: 4,
               label: "Total Sales Value", 
-              number: "$2.5B+",
+              number: "₹25.5L+",
               icon: "DollarSign"
             }
           ]);
