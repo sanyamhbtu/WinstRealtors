@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Facebook, Instagram, Linkedin, Twitter, Mail, Phone, MapPin } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Twitter, Youtube, Mail, Phone, MapPin } from "lucide-react";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -29,7 +29,7 @@ export default function Footer() {
             </p>
             <div className="flex space-x-4">
               <a
-                href="https://facebook.com"
+                href="https://www.facebook.com/61583892713142/?http_ref=eyJ0cyI6MTc2NTc0MTAxMDAwMCwiciI6IiJ9"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-white/10 hover:bg-[#D4AF37] transition-colors flex items-center justify-center"
@@ -37,7 +37,7 @@ export default function Footer() {
                 <Facebook className="w-5 h-5 " />
               </a>
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/winst_realtors/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-white/10 hover:bg-[#D4AF37] transition-colors flex items-center justify-center"
@@ -45,7 +45,7 @@ export default function Footer() {
                 <Instagram className="w-5 h-5" />
               </a>
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/in/winst-realtors-private-limited-b4830a398/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-white/10 hover:bg-[#D4AF37] transition-colors flex items-center justify-center"
@@ -53,12 +53,12 @@ export default function Footer() {
                 <Linkedin className="w-5 h-5" />
               </a>
               <a
-                href="https://twitter.com"
+                href="https://www.youtube.com/@WinstRealtors"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-white/10 hover:bg-[#D4AF37] transition-colors flex items-center justify-center"
               >
-                <Twitter className="w-5 h-5" />
+                <Youtube className="w-5 h-5" />
               </a>
             </div>
           </div>
@@ -149,14 +149,21 @@ export default function Footer() {
               </li>
               <li className="flex items-center space-x-3">
                 <Phone className="w-5 h-5 text-[#D4AF37] flex-shrink-0" />
-                <a href="tel:+12125551234" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
-                  +91 96343 96117 , 81301 84250
+                <a href="tel:+919634396117" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
+                  +91 9634396117
+                </a>
+                <br />
+                <a href="tel:+918130184250" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
+                  +91 8130184250
                 </a>
               </li>
               <li className="flex items-center space-x-3">
                 <Mail className="w-5 h-5 text-[#D4AF37] flex-shrink-0" />
                 <a href="mailto:info@winstrealtors.com" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
-                  info@winstrealtors.com , sales@winstrealtors.com
+                  info@winstrealtors.com
+                </a> <br />
+                <a href="mailto:sales@winstrealtors.com" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
+                  sales@winstrealtors.com
                 </a>
               </li>
             </ul>
@@ -168,7 +175,7 @@ export default function Footer() {
             <p className="text-gray-400 text-sm">
               © {currentYear} Winst Realtors. All rights reserved.
             </p>
-            <div className="flex space-x-6">
+            {/* <div className="flex space-x-6">
               <Link href="/v3/privacy" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
                 Privacy Policy
               </Link>
@@ -178,7 +185,7 @@ export default function Footer() {
               <Link href="/v3/sitemap" className="text-gray-400 hover:text-[#D4AF37] transition-colors text-sm">
                 Sitemap
               </Link>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
