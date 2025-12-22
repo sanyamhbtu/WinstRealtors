@@ -1,18 +1,18 @@
-import { google, calendar_v3 } from 'googleapis';
-import { format, parseISO, addHours } from 'date-fns';
-import { formatInTimeZone, toZonedTime } from 'date-fns-tz';
-import { getCalendarClient, isCalendarConfigured } from './google-calendar';
+import nodemailer from "nodemailer";
+import { addMinutes, format } from "date-fns";
+
+/* ================= TYPES ================= */
 
 interface CreateEventInput {
   title: string;
   description?: string;
-  date: string; // YYYY-MM-DD
-  time: string; // e.g., "2:00 PM"
-  duration?: number; // in minutes, default 60
-  timeZone?: string; // IANA timezone, default 'America/New_York'
+  date: string;
+  time: string;
+  duration?: number;
+  timeZone?: string;
   attendees?: Array<{ email: string; displayName?: string }>;
   location?: string;
-  calendarId?: string; // defaults to 'primary'
+  calendarId?: string;
 }
 
 interface CreateEventResponse {
@@ -21,218 +21,153 @@ interface CreateEventResponse {
   status: string;
 }
 
-// Convert 12-hour time format to Date object
-function parseTimeToDate(date: string, time: string): Date {
-  // Parse date (YYYY-MM-DD)
-  const dateParts = date.split('-');
-  const year = parseInt(dateParts[0]);
-  const month = parseInt(dateParts[1]) - 1; // JS months are 0-indexed
-  const day = parseInt(dateParts[2]);
+/* ================= EMAIL SETUP ================= */
 
-  // Parse time (e.g., "2:00 PM")
-  const timeMatch = time.match(/(\d+):(\d+)\s*(AM|PM)/i);
-  if (!timeMatch) {
-    throw new Error(`Invalid time format: ${time}`);
+function getMailer() {
+  if (
+    !process.env.SMTP_HOST ||
+    !process.env.SMTP_PORT ||
+    !process.env.SMTP_USER ||
+    !process.env.SMTP_PASS
+  ) {
+    console.log("SMTP not configured");
+    throw new Error("SMTP not configured");
   }
 
-  let hours = parseInt(timeMatch[1]);
-  const minutes = parseInt(timeMatch[2]);
-  const period = timeMatch[3].toUpperCase();
-
-  // Convert to 24-hour format
-  if (period === 'PM' && hours !== 12) {
-    hours += 12;
-  } else if (period === 'AM' && hours === 12) {
-    hours = 0;
-  }
-
-  return new Date(year, month, day, hours, minutes, 0);
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT),
+    secure: false,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
 }
+
+/* ================= HELPERS ================= */
+
+function parseDateTime(date: string, time: string) {
+  const [y, m, d] = date.split("-").map(Number);
+  const [, h, min, ap] = time.match(/(\d+):(\d+)\s*(AM|PM)/i)!;
+
+  let hour = Number(h);
+  if (ap.toUpperCase() === "PM" && hour !== 12) hour += 12;
+  if (ap.toUpperCase() === "AM" && hour === 12) hour = 0;
+
+  return new Date(y, m - 1, d, hour, Number(min));
+}
+
+/* ================= EMAIL TEMPLATES ================= */
+
+async function sendClientMail(input: CreateEventInput) {
+  const mailer = getMailer();
+  const start = parseDateTime(input.date, input.time);
+  const end = addMinutes(start, input.duration ?? 60);
+
+  await mailer.sendMail({
+    from: `"Winst Realtors" <${process.env.SMTP_USER}>`,
+    to: input.attendees?.[0]?.email || "",
+    subject: `Your Appointment is Confirmed - ${input.date} ${input.time}`,
+    html: `
+      <h2>Appointment Confirmed 🎉</h2>
+
+      <p>Your consultation with <b>Winst Realtors</b> is confirmed.</p>
+
+      <b>Topic:</b> ${input.title}<br/>
+      <b>Date:</b> ${input.date}<br/>
+      <b>Time:</b> ${input.time}<br/>
+      <b>Ends:</b> ${format(end, "hh:mm a")}<br/>
+      ${input.location ? `<b>Location:</b> ${input.location}<br/>` : ""}
+
+      ${input.description ? `<p>${input.description}</p>` : ""}
+
+      <p>Our team will contact you shortly.</p>
+      <br/>
+      <strong>Winst Realtors</strong>
+    `,
+  });
+}
+
+async function sendAdminMail(input: CreateEventInput) {
+  const mailer = getMailer();
+  const start = parseDateTime(input.date, input.time);
+  const end = addMinutes(start, input.duration ?? 60);
+
+  const smtpUser = process.env.SMTP_USER || "noreply@winstrealtors.com";
+
+  await mailer.sendMail({
+  from: `"Winst Realtors System" <${smtpUser}>`,
+  to: [
+    process.env.ADMIN_EMAIL || smtpUser,
+    "sales@winstrealtors.com"
+  ].filter(Boolean),
+  subject: `NEW CONFIRMED BOOKING - ${input.title}`,
+  html: `
+    <h2>New Confirmed Booking</h2>
+    <b>Title:</b> ${input.title}<br/>
+    <b>Date:</b> ${input.date}<br/>
+    <b>Time:</b> ${input.time}<br/>
+    <b>Ends:</b> ${format(end, "hh:mm a")}<br/>
+    ${input.location ? `<b>Location:</b> ${input.location}<br/>` : ""}
+    ${
+      input.attendees?.length
+        ? `<b>Client:</b> ${input.attendees[0].email}<br/>`
+        : ""
+    }
+    ${input.description ? `<p>${input.description}</p>` : ""}
+    <hr/>
+    <p>Login admin panel for more details.</p>
+  `,
+});
+
+}
+
+/* ================= CREATE EVENT ================= */
 
 export async function createCalendarEvent(
   input: CreateEventInput
 ): Promise<CreateEventResponse> {
-  if (!isCalendarConfigured()) {
-    console.warn('Google Calendar not configured, skipping event creation');
-    return {
-      eventId: '',
-      htmlLink: '',
-      status: 'not_configured',
-    };
-  }
-
   try {
-    const calendar = getCalendarClient();
-    const timeZone = input.timeZone || 'America/New_York';
-    const duration = input.duration || 60;
-
-    // Parse start time
-    const startDate = parseTimeToDate(input.date, input.time);
-    
-    // Calculate end time
-    const endDate = addHours(startDate, duration / 60);
-
-    // Format for Google Calendar API (ISO 8601)
-    const startDateTime = format(startDate, "yyyy-MM-dd'T'HH:mm:ss");
-    const endDateTime = format(endDate, "yyyy-MM-dd'T'HH:mm:ss");
-
-    const eventBody: calendar_v3.Schema$Event = {
-      summary: input.title,
-      description: input.description,
-      location: input.location,
-      start: {
-        dateTime: startDateTime,
-        timeZone: timeZone,
-      },
-      end: {
-        dateTime: endDateTime,
-        timeZone: timeZone,
-      },
-      attendees:
-        input.attendees?.map((a) => ({
-          email: a.email,
-          displayName: a.displayName,
-        })) || [],
-      reminders: {
-        useDefault: false,
-        overrides: [
-          { method: 'email', minutes: 24 * 60 }, // 1 day before
-          { method: 'popup', minutes: 60 }, // 1 hour before
-        ],
-      },
-    };
-
-    const response = await calendar.events.insert({
-      calendarId: input.calendarId || 'primary',
-      requestBody: eventBody,
-      sendUpdates: 'all', // Send email notifications to attendees
-    });
-
-    if (!response.data.id) {
-      throw new Error('Failed to create event: No event ID returned');
-    }
-
-    console.log('Calendar event created:', {
-      eventId: response.data.id,
-      htmlLink: response.data.htmlLink,
-    });
+    await sendClientMail(input);
+    await sendAdminMail(input);
 
     return {
-      eventId: response.data.id,
-      htmlLink: response.data.htmlLink || '',
-      status: response.data.status || 'confirmed',
+      eventId: "smtp-email",
+      htmlLink: "",
+      status: "confirmed",
     };
-  } catch (error) {
-    console.error('Error creating calendar event:', error);
-    throw handleCalendarError(error);
+  } catch (e) {
+    console.error("EMAIL ERROR:", e);
+    throw new Error("Failed to send confirmation emails");
   }
 }
+
+/* ================= UPDATE EVENT ================= */
 
 export async function updateCalendarEvent(
   eventId: string,
-  input: Partial<CreateEventInput>,
-  calendarId = 'primary'
+  input: Partial<CreateEventInput>
 ): Promise<CreateEventResponse> {
-  if (!isCalendarConfigured()) {
-    console.warn('Google Calendar not configured, skipping event update');
-    return {
-      eventId,
-      htmlLink: '',
-      status: 'not_configured',
-    };
-  }
-
   try {
-    const calendar = getCalendarClient();
-    const timeZone = input.timeZone || 'America/New_York';
-
-    const updateBody: calendar_v3.Schema$Event = {
-      summary: input.title,
-      description: input.description,
-      location: input.location,
-    };
-
-    if (input.date && input.time) {
-      const duration = input.duration || 60;
-      const startDate = parseTimeToDate(input.date, input.time);
-      const endDate = addHours(startDate, duration / 60);
-
-      const startDateTime = format(startDate, "yyyy-MM-dd'T'HH:mm:ss");
-      const endDateTime = format(endDate, "yyyy-MM-dd'T'HH:mm:ss");
-
-      updateBody.start = {
-        dateTime: startDateTime,
-        timeZone: timeZone,
-      };
-      updateBody.end = {
-        dateTime: endDateTime,
-        timeZone: timeZone,
-      };
-    }
-
-    const response = await calendar.events.update({
-      calendarId,
-      eventId,
-      requestBody: updateBody,
-      sendUpdates: 'all',
-    });
-
-    return {
-      eventId: response.data.id || eventId,
-      htmlLink: response.data.htmlLink || '',
-      status: response.data.status || 'confirmed',
-    };
-  } catch (error) {
-    console.error('Error updating calendar event:', error);
-    throw handleCalendarError(error);
+    // Optional: send reschedule email later if needed
+    return { eventId, htmlLink: "", status: "confirmed" };
+  } catch (e) {
+    console.error("EMAIL ERROR:", e);
+    throw new Error("Failed to update booking email");
   }
 }
 
-export async function deleteCalendarEvent(
-  eventId: string,
-  calendarId = 'primary'
-): Promise<void> {
-  if (!isCalendarConfigured()) {
-    console.warn('Google Calendar not configured, skipping event deletion');
-    return;
-  }
+/* ================= DELETE EVENT ================= */
 
-  try {
-    const calendar = getCalendarClient();
-    await calendar.events.delete({ 
-      calendarId, 
-      eventId,
-      sendUpdates: 'all',
-    });
-    console.log('Calendar event deleted:', eventId);
-  } catch (error) {
-    console.error('Error deleting calendar event:', error);
-    throw handleCalendarError(error);
-  }
+export async function deleteCalendarEvent() {
+  // Optional: send cancellation email if you want later
+  return;
 }
 
-// Error handling utility
+/* ================= ERROR HANDLER ================= */
+
 export function handleCalendarError(error: unknown): Error {
-  if (error instanceof Error) {
-    const message = error.message;
-
-    if (message.includes('404')) {
-      return new Error('Calendar or event not found');
-    }
-    if (message.includes('403')) {
-      return new Error(
-        'Permission denied: Check credentials and calendar access'
-      );
-    }
-    if (message.includes('429')) {
-      return new Error('Rate limited: Too many requests');
-    }
-    if (message.includes('401')) {
-      return new Error('Authentication failed: Invalid or expired credentials');
-    }
-
-    return error;
-  }
-
-  return new Error('Unknown calendar error');
+  console.error("EMAIL MODULE ERROR:", error);
+  return new Error("Email System Error");
 }

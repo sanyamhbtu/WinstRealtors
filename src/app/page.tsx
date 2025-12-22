@@ -326,10 +326,10 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="relative h-[500px] rounded-lg overflow-hidden">
               <Image
-                src="https://res.cloudinary.com/dxxielg5u/image/upload/v1765511859/1_xvoexa.png"
+                src="https://res.cloudinary.com/dxxielg5u/image/upload/v1766377926/officeimg_e9et3p.jpg"
                 alt="About Winst Realtors"
                 fill
-                className="object-cover"
+                className="object-fit"
               />
             </div>
 

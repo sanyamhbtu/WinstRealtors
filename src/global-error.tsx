@@ -1,5 +1,5 @@
 "use client";
 
-import ErrorReporter from "@/src/components/ErrorReporter";
+import ErrorReporter from "@/components/ErrorReporter";
 
 export default ErrorReporter;
