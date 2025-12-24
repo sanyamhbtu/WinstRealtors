@@ -257,7 +257,7 @@ const process = [
                 size="lg"
                 className="bg-[#D4AF37] hover:bg-[#C4A030] text-white"
               >
-                <Link href="/consultation">
+                <Link href="/v3/consultation">
                   Schedule Consultation <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
@@ -290,7 +290,7 @@ const process = [
               size="lg"
               className="bg-[#D4AF37] hover:bg-[#C4A030] text-white text-lg px-8 py-6"
             >
-              <Link href="/contact">
+              <Link href="/v3/contact">
                 Contact Us <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
@@ -300,7 +300,7 @@ const process = [
               variant="outline"
               className="border-2 border-[#1a2332] text-[#1a2332] hover:bg-[#1a2332] hover:text-white text-lg px-8 py-6"
             >
-              <Link href="/properties">View Properties</Link>
+              <Link href="/v3/properties">View Properties</Link>
             </Button>
           </div>
         </div>

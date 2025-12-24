@@ -14,10 +14,25 @@ export default function ContactPage() {
     message: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log("Form submitted:", formData);
+    try {
+      const res = await fetch("/api/contacts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+    const data = await res.json();
+    console.log("API Response:", data);
+    if (!res.ok) {
+      alert(data.error || "Failed to submit form");
+      return;
+    }
+    alert("Form submitted successfully!");
+    } catch (error) {
+      console.error(error);
+    alert("Something went wrong. Try again.");
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -238,7 +253,7 @@ export default function ContactPage() {
                   asChild
                   className="w-full bg-[#D4AF37] hover:bg-[#C4A030] text-white"
                 >
-                  <a href="/consultation">Book Now</a>
+                  <a href="/v3/consultation">Book Now</a>
                 </Button>
               </div>
             </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,18 @@ export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [propertiesOpen, setPropertiesOpen] = useState(false);
+   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event : any) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setPropertiesOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,29 +73,30 @@ export default function Navigation() {
             </Link>
             
             {/* Properties Dropdown */}
-            <div
-              className="relative"
-              onMouseEnter={() => setPropertiesOpen(true)}
-              onMouseLeave={() => setPropertiesOpen(false)}
+            <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setPropertiesOpen(prev => !prev)}
+        className="flex items-center space-x-1 text-[#1a2332] hover:text-[#D4AF37] transition-colors font-medium"
+      >
+        <span>Properties</span>
+        <ChevronDown className="w-4 h-4" />
+      </button>
+
+      {propertiesOpen && (
+        <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-xl py-2 border border-gray-100">
+          {propertyLinks.map((link) => (
+            <Link
+              key={link.name}
+              href={link.href}
+              onClick={() => setPropertiesOpen(false)}   // close on item click
+              className="block px-4 py-2.5 text-sm text-[#1a2332] hover:bg-[#fafaf8] hover:text-[#D4AF37] transition-colors"
             >
-              <button className="flex items-center space-x-1 text-[#1a2332] hover:text-[#D4AF37] transition-colors font-medium">
-                <span>Properties</span>
-                <ChevronDown className="w-4 h-4" />
-              </button>
-              {propertiesOpen && (
-                <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-xl py-2 border border-gray-100">
-                  {propertyLinks.map((link) => (
-                    <Link
-                      key={link.name}
-                      href={link.href}
-                      className="block px-4 py-2.5 text-sm text-[#1a2332] hover:bg-[#fafaf8] hover:text-[#D4AF37] transition-colors"
-                    >
-                      {link.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
+              {link.name}
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
 
             <Link
               href="/v3/about"

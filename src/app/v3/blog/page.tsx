@@ -255,7 +255,7 @@ export default function BlogPage() {
             <input
               type="email"
               placeholder="Enter your email"
-              className="flex-1 px-6 py-4 rounded-lg text-[#1a2332] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+              className="flex-1 px-6 py-4 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
             />
             <Button className="bg-[#D4AF37] hover:bg-[#C4A030] text-white px-8 py-4">
               Subscribe
