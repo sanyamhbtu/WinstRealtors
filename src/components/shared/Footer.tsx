@@ -144,7 +144,7 @@ export default function Footer() {
               <li className="flex items-start space-x-3">
                 <MapPin className="w-5 h-5 text-[#D4AF37] flex-shrink-0 mt-0.5" />
                 <span className="text-gray-400 text-sm">
-                  The Galleria Square,<br />26, Harsh Commercial Park,  Garh Road Meerut,<br /> near Vivan Hospital Meerut <br /> Uttar Pradesh, India
+                  The Galleria Square,<br />26, Harsh Commercial Park,  Garh Road Meerut,<br /> near Vivan Hospital Meerut <br /> Uttar Pradesh, India <br/> 250002
                 </span>
               </li>
               <li className="flex items-center space-x-3">

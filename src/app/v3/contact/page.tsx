@@ -45,7 +45,7 @@ export default function ContactPage() {
   const offices = [
     {
       city: "Meerut",
-      address: "The Galleria Square, 26, Harsh Commercial Park,  Garh Road Meerut, near Vivan Hospital  Meerut Uttar Pradesh, India",
+      address: "The Galleria Square, 26, Harsh Commercial Park,  Garh Road Meerut, near Vivan Hospital  Meerut Uttar Pradesh, India, 250004",
       phone: "+91 96343 96117, +91 81301 84250",
       email: "sales@winstrealtors.com",
       hours: "Mon-Sun: 10:00 AM - 7:00 PM",
@@ -196,7 +196,7 @@ export default function ContactPage() {
                       <h4 className="font-semibold text-[#1a2332] mb-1">Main Office</h4>
                       <p className="text-gray-600">
                         26, Harsh Commercial Park,  Garh Road<br />
-                        near Vivan Hospital  Meerut Uttar Pradesh
+                        near Vivan Hospital  Meerut Uttar Pradesh, 250004
                       </p>
                     </div>
                   </div>
