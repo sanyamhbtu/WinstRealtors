@@ -28,39 +28,60 @@ export default function Footer() {
               and exceptional service for discerning clients.
             </p>
             <div className="flex space-x-4">
-              <a
-                href="https://www.facebook.com/61583892713142/?http_ref=eyJ0cyI6MTc2NTc0MTAxMDAwMCwiciI6IiJ9"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-white/10 hover:bg-[#D4AF37] transition-colors flex items-center justify-center"
-              >
-                <Facebook className="w-5 h-5 " />
-              </a>
-              <a
-                href="https://www.instagram.com/winst_realtors/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-white/10 hover:bg-[#D4AF37] transition-colors flex items-center justify-center"
-              >
-                <Instagram className="w-5 h-5" />
-              </a>
-              <a
-                href="https://www.linkedin.com/in/winst-realtors-private-limited-b4830a398/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-white/10 hover:bg-[#D4AF37] transition-colors flex items-center justify-center"
-              >
-                <Linkedin className="w-5 h-5" />
-              </a>
-              <a
-                href="https://www.youtube.com/@WinstRealtors"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-white/10 hover:bg-[#D4AF37] transition-colors flex items-center justify-center"
-              >
-                <Youtube className="w-5 h-5" />
-              </a>
-            </div>
+  <a
+    href="https://www.facebook.com/61583892713142/?http_ref=eyJ0cyI6MTc2NTc0MTAxMDAwMCwiciI6IiJ9"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="w-10 h-10 rounded-full bg-white
+               flex items-center justify-center
+               text-[#1877F2]
+               transition-all duration-300
+               hover:scale-110 hover:-translate-y-1"
+  >
+    <Facebook className="w-5 h-5" />
+  </a>
+
+  <a
+    href="https://www.instagram.com/winst_realtors/"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="w-10 h-10 rounded-full bg-white
+               flex items-center justify-center
+               text-[#E4405F]
+               transition-all duration-300
+               hover:scale-110 hover:-translate-y-1"
+  >
+    <Instagram className="w-5 h-5" />
+  </a>
+
+  <a
+    href="https://www.linkedin.com/in/winst-realtors-private-limited-b4830a398/"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="w-10 h-10 rounded-full bg-white
+               flex items-center justify-center
+               text-[#0A66C2]
+               transition-all duration-300
+               hover:scale-110 hover:-translate-y-1"
+  >
+    <Linkedin className="w-5 h-5" />
+  </a>
+
+  <a
+    href="https://www.youtube.com/@WinstRealtors"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="w-10 h-10 rounded-full bg-white
+               flex items-center justify-center
+               text-[#FF0000]
+               transition-all duration-300
+               hover:scale-110 hover:-translate-y-1"
+  >
+    <Youtube className="w-5 h-5" />
+  </a>
+</div>
+
+
           </div>
 
           {/* Quick Links */}
