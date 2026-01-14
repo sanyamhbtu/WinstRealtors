@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, User, Mail, Phone, MessageSquare, CheckCircle2, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-
+import LeftSideBar from "@/components/shared/LeftSideBar";
 export default function ConsultationPage() {
   const [formData, setFormData] = useState({
     name: "",

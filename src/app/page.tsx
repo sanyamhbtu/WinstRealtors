@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import Navigation from "@/components/shared/Navigation";
 import Footer from "@/components/shared/Footer";
 import WhatsAppButton from "@/components/shared/WhatsAppButton";
+import LeftSideBar from "@/components/shared/LeftSideBar";
 
 export default function Home() {
   const router = useRouter();
@@ -153,6 +154,7 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       <Navigation />
+     <LeftSideBar />
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">

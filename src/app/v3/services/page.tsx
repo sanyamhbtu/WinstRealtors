@@ -12,7 +12,7 @@ import {
   KeyRound,
   Banknote
 } from "lucide-react";
-
+import LeftSideBar from "@/components/shared/LeftSideBar";
 export default function ServicesPage() {
 const services = [
   {
@@ -131,6 +131,7 @@ const process = [
 
   return (
     <main className="min-h-screen pt-20">
+      <LeftSideBar />
       {/* Hero Section */}
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { MapPin, Phone, Mail, Clock, Send } from "lucide-react";
-
+import LeftSideBar from "@/components/shared/LeftSideBar";
 export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: "",
@@ -54,6 +54,7 @@ export default function ContactPage() {
 
   return (
     <main className="min-h-screen pt-20">
+      <LeftSideBar />
       {/* Hero Section */}
       <section className="relative h-[50vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { X, ZoomIn, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-
+import LeftSideBar from "@/components/shared/LeftSideBar";
 interface GalleryImage {
   id: number;
   image: string;
@@ -85,6 +85,7 @@ export default function GalleryPage() {
 
   return (
     <main className="min-h-screen pt-20">
+      <LeftSideBar />
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-[#1a2332] to-[#2d3e50] text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

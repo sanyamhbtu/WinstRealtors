@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Award, Users, Globe, TrendingUp, Shield, Heart, Zap } from "lucide-react";
-
+import LeftSideBar from "@/components/shared/LeftSideBar";
 export default function AboutPage() {
   const team = [
     {
@@ -81,6 +81,7 @@ export default function AboutPage() {
   return (
     <main className="min-h-screen pt-20">
       {/* Hero Section */}
+      <LeftSideBar />
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
