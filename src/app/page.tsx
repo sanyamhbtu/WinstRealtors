@@ -170,7 +170,7 @@ export default function Home() {
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white">
           <div className="max-w-3xl">
-            <h1 className="font-display text-4xl md:text-7xl font-bold  mb-6 leading-tight text-shadow-luxury">
+            <h1 className="font-display text-2xl md:text-5xl font-bold  mb-6 leading-tight text-shadow-luxury">
               Discover Your Dream
               <span className="block text-[#D4AF37]">Luxury Estate</span>
             </h1>

@@ -240,24 +240,28 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
 
                 {/* Quick Stats */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-200">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 bg-[#fafaf8] rounded-lg flex items-center justify-center">
-                      <Bed className="w-6 h-6 text-[#D4AF37]" />
+                  {property.bedrooms > 0 && (
+                    <div className="flex items-center space-x-3">
+                      <div className="w-12 h-12 bg-[#fafaf8] rounded-lg flex items-center justify-center">
+                        <Bed className="w-6 h-6 text-[#D4AF37]" />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold text-[#1a2332]">{property.bedrooms}</p>
+                        <p className="text-sm text-gray-600">Bedrooms</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-2xl font-bold text-[#1a2332]">{property.bedrooms}</p>
-                      <p className="text-sm text-gray-600">Bedrooms</p>
+                  )}
+                  {property.bathrooms > 0 && (
+                    <div className="flex items-center space-x-3">
+                      <div className="w-12 h-12 bg-[#fafaf8] rounded-lg flex items-center justify-center">
+                        <Bath className="w-6 h-6 text-[#D4AF37]" />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold text-[#1a2332]">{property.bathrooms}</p>
+                        <p className="text-sm text-gray-600">Bathrooms</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 bg-[#fafaf8] rounded-lg flex items-center justify-center">
-                      <Bath className="w-6 h-6 text-[#D4AF37]" />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold text-[#1a2332]">{property.bathrooms}</p>
-                      <p className="text-sm text-gray-600">Bathrooms</p>
-                    </div>
-                  </div>
+                  )}
                   <div className="flex items-center space-x-3">
                     <div className="w-12 h-12 bg-[#fafaf8] rounded-lg flex items-center justify-center">
                       <Square className="w-6 h-6 text-[#D4AF37]" />

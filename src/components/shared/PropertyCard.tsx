@@ -76,14 +76,18 @@ export default function PropertyCard({
         </div>
 
         <div className="flex items-center justify-between py-3 border-t border-b border-gray-100 mb-4">
-          <div className="flex items-center space-x-1 text-gray-600 text-sm">
-            <Bed className="w-4 h-4" />
-            <span>{bedrooms}</span>
-          </div>
-          <div className="flex items-center space-x-1 text-gray-600 text-sm">
-            <Bath className="w-4 h-4" />
-            <span>{bathrooms}</span>
-          </div>
+          {bedrooms > 0 && (
+            <div className="flex items-center space-x-1 text-gray-600 text-sm">
+              <Bed className="w-4 h-4" />
+              <span>{bedrooms}</span>
+            </div>
+          )}
+          {bathrooms > 0 && (
+            <div className="flex items-center space-x-1 text-gray-600 text-sm">
+              <Bath className="w-4 h-4" />
+              <span>{bathrooms}</span>
+            </div>
+          )}
           <div className="flex items-center space-x-1 text-gray-600 text-sm">
             <Square className="w-4 h-4" />
             <span>{area}</span>
