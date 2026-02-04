@@ -23,7 +23,8 @@ import {
   Lock,
   Mail,
   Settings,
-  Menu
+  Menu,
+  Award
 } from "lucide-react";
 import { toast } from "sonner";
 import { useSession, authClient } from "@/lib/auth-client";
@@ -67,6 +68,7 @@ export default function AdminDashboard() {
   const [contacts, setContacts] = useState<any[]>([]);
   const [faqs, setFaqs] = useState<any[]>([]);
   const [galleryItems, setGalleryItems] = useState<any[]>([]);
+  const [homepageStats, setHomepageStats] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
@@ -138,6 +140,10 @@ export default function AdminDashboard() {
         case "gallery":
           endpoint = "/api/gallery-items?limit=50";
           setter = setGalleryItems;
+          break;
+        case "homepage-stats":
+          endpoint = "/api/homepage-stats";
+          setter = setHomepageStats;
           break;
       }
 
@@ -408,6 +414,12 @@ export default function AdminDashboard() {
         image: "",
         description: "",
         published: false
+      },
+      "homepage-stats": {
+        label: "",
+        value: "",
+        icon: "Star",
+        orderIndex: 0
       }
     };
     
@@ -472,6 +484,7 @@ export default function AdminDashboard() {
         contacts: "/api/contacts",
         faqs: "/api/faqs",
         gallery: "/api/gallery-items",
+        "homepage-stats": "/api/homepage-stats",
       };
 
       const method = isCreating ? "POST" : "PUT";
@@ -525,6 +538,7 @@ export default function AdminDashboard() {
         contacts: "/api/contacts",
         faqs: "/api/faqs",
         gallery: "/api/gallery-items",
+        "homepage-stats": "/api/homepage-stats",
       };
 
       const token = localStorage.getItem("bearer_token");
@@ -680,6 +694,7 @@ export default function AdminDashboard() {
               { id: "partners", icon: Users, label: "Partners" },
               { id: "bookings", icon: Calendar, label: "Bookings" },
               { id: "contacts", icon: MessageSquare, label: "Contacts" },
+              { id: "homepage-stats", icon: Award, label: "Homepage Stats" },
               { id: "settings", icon: Settings, label: "Settings" },
             ].map((item) => {
               const Icon = item.icon;
@@ -735,8 +750,9 @@ export default function AdminDashboard() {
                   {activeTab === "partners" && "Partners"}
                   {activeTab === "bookings" && "Consultation Bookings"}
                   {activeTab === "contacts" && "Contact Submissions"}
-                  {activeTab === "faqs" && "FAQs Management"}
-                  {activeTab === "settings" && "Admin Settings"}
+                  { activeTab === "faqs" && "FAQs Management" }
+                  { activeTab === "homepage-stats" && "Homepage Stats" }
+                  { activeTab === "settings" && "Admin Settings" }
                 </h1>
                 <p className="text-sm md:text-base text-gray-600">Welcome back, {session.user.name || session.user.email}</p>
               </div>
@@ -1463,6 +1479,59 @@ export default function AdminDashboard() {
               )}
             </div>
           )}
+
+          {/* Homepage Stats Management */}
+          {activeTab === "homepage-stats" && (
+             <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
+               {loading ? (
+                 <div className="flex justify-center py-12">
+                   <Loader2 className="w-8 h-8 animate-spin text-[#D4AF37]" />
+                 </div>
+               ) : (
+                 <div className="overflow-x-auto -mx-4 md:mx-0">
+                   <div className="inline-block min-w-full align-middle">
+                     <table className="min-w-full">
+                       <thead>
+                         <tr className="border-b border-gray-200">
+                           <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Order</th>
+                           <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Label</th>
+                           <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Value</th>
+                           <th className="text-left py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base">Icon</th>
+                           <th className="text-right py-3 px-3 md:px-4 font-semibold text-gray-700 text-sm md:text-base whitespace-nowrap">Actions</th>
+                         </tr>
+                       </thead>
+                       <tbody>
+                         {homepageStats.map((stat) => (
+                           <tr key={stat.id} className="border-b border-gray-100 hover:bg-gray-50">
+                             <td className="py-3 px-3 md:px-4 text-sm md:text-base">{stat.orderIndex}</td>
+                             <td className="py-3 px-3 md:px-4 text-sm md:text-base font-medium">{stat.label}</td>
+                             <td className="py-3 px-3 md:px-4 text-sm md:text-base">{stat.value}</td>
+                             <td className="py-3 px-3 md:px-4 text-sm md:text-base">{stat.icon}</td>
+                             <td className="py-3 px-3 md:px-4">
+                               <div className="flex items-center justify-end space-x-1 md:space-x-2">
+                                 <button 
+                                   onClick={() => handleEdit(stat, "homepage-stats")}
+                                   className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                 >
+                                   <Edit className="w-4 h-4 text-blue-600" />
+                                 </button>
+                                 <button 
+                                   onClick={() => handleDelete(stat.id, "homepage-stats")}
+                                   className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                 >
+                                   <Trash2 className="w-4 h-4 text-red-600" />
+                                 </button>
+                               </div>
+                             </td>
+                           </tr>
+                         ))}
+                       </tbody>
+                     </table>
+                   </div>
+                 </div>
+               )}
+             </div>
+           )}
         </div>
       </main>
 
@@ -1584,20 +1653,22 @@ function EditForm({ item, type, onChange, onSave, onCancel, isCreating, isSaving
               <label className="block text-sm font-medium text-gray-700 mb-2">Bedrooms</label>
               <input
                 type="number"
-                value={item.bedrooms || ""}
+                value={item.bedrooms}
                 onChange={(e) => handleChange("bedrooms", e.target.value === "" ? 0 : parseInt(e.target.value))}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
                 placeholder="0"
+                min="0"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Bathrooms</label>
               <input
                 type="number"
-                value={item.bathrooms || ""}
+                value={item.bathrooms}
                 onChange={(e) => handleChange("bathrooms", e.target.value === "" ? 0 : parseInt(e.target.value))}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
                 placeholder="0"
+                min="0"
               />
             </div>
           </div>
@@ -1759,47 +1830,96 @@ function EditForm({ item, type, onChange, onSave, onCancel, isCreating, isSaving
               />
             </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
-            <input
-              type="text"
-              value={item.image || ""}
-              onChange={(e) => handleChange("image", e.target.value)}
-              placeholder="https://example.com/blog-image.jpg"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Excerpt</label>
-            <textarea
-              value={item.excerpt || ""}
-              onChange={(e) => handleChange("excerpt", e.target.value)}
-              rows={2}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
-            <textarea
-              value={item.content || ""}
-              onChange={(e) => handleChange("content", e.target.value)}
-              rows={6}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
-            />
-          </div>
-          <div>
-            <label className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={item.published || false}
-                onChange={(e) => handleChange("published", e.target.checked)}
-                className="rounded border-gray-300 text-[#D4AF37] focus:ring-[#D4AF37]"
-              />
-              <span className="text-sm font-medium text-gray-700">Published</span>
-            </label>
-          </div>
-        </>
-      )}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
+        <input
+          type="text"
+          value={item.image || ""}
+          onChange={(e) => handleChange("image", e.target.value)}
+          placeholder="https://example.com/blog-image.jpg"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Excerpt</label>
+        <textarea
+          value={item.excerpt || ""}
+          onChange={(e) => handleChange("excerpt", e.target.value)}
+          rows={2}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
+        <textarea
+          value={item.content || ""}
+          onChange={(e) => handleChange("content", e.target.value)}
+          rows={6}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
+        />
+      </div>
+      <div>
+        <label className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            checked={item.published || false}
+            onChange={(e) => handleChange("published", e.target.checked)}
+            className="rounded border-gray-300 text-[#D4AF37] focus:ring-[#D4AF37]"
+          />
+          <span className="text-sm font-medium text-gray-700">Published</span>
+        </label>
+      </div>
+    </>
+  )}
+
+  {/* Homepage Stats Form */}
+  {type === "homepage-stats" && (
+    <>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Label</label>
+        <input
+          type="text"
+          value={item.label || ""}
+          onChange={(e) => handleChange("label", e.target.value)}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
+          placeholder="e.g. Years Experience"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Value</label>
+        <input
+          type="text"
+          value={item.value || ""}
+          onChange={(e) => handleChange("value", e.target.value)}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
+          placeholder="e.g. 25+ or AUTO"
+        />
+        <p className="text-xs text-gray-500 mt-1">Use "AUTO" to automatically count from database (for Properties/Testimonials)</p>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Icon</label>
+        <select
+          value={item.icon || "Star"}
+          onChange={(e) => handleChange("icon", e.target.value)}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
+        >
+          <option value="Star">Star (Happy Clients)</option>
+          <option value="Award">Award (Experience)</option>
+          <option value="DollarSign">Dollar Sign (Sales)</option>
+          <option value="Building">Building (Properties)</option>
+        </select>
+      </div>
+       <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Order Index</label>
+        <input
+          type="number"
+          value={item.orderIndex || 0}
+          onChange={(e) => handleChange("orderIndex", parseInt(e.target.value))}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
+        />
+      </div>
+    </>
+  )}
 
       {/* Testimonials Form */}
       {type === "testimonials" && (

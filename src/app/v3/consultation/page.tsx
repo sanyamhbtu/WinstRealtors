@@ -4,9 +4,184 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, User, Mail, Phone, MessageSquare, CheckCircle2, ArrowRight, Loader2 } from "lucide-react";
+import { Calendar, Clock, User, Mail, Phone, MessageSquare, CheckCircle2, ArrowRight, Loader2, Check, ChevronsUpDown } from "lucide-react";
 import { toast } from "sonner";
 import LeftSideBar from "@/components/shared/LeftSideBar";
+import { cn } from "@/lib/utils";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+const indianLocations = [
+  // Andhra Pradesh
+  { value: "Visakhapatnam, Andhra Pradesh", label: "Visakhapatnam, Andhra Pradesh" },
+  { value: "Vijayawada, Andhra Pradesh", label: "Vijayawada, Andhra Pradesh" },
+  { value: "Guntur, Andhra Pradesh", label: "Guntur, Andhra Pradesh" },
+  { value: "Nellore, Andhra Pradesh", label: "Nellore, Andhra Pradesh" },
+  { value: "Kurnool, Andhra Pradesh", label: "Kurnool, Andhra Pradesh" },
+
+  // Assam
+  { value: "Guwahati, Assam", label: "Guwahati, Assam" },
+  { value: "Silchar, Assam", label: "Silchar, Assam" },
+
+  // Bihar
+  { value: "Patna, Bihar", label: "Patna, Bihar" },
+  { value: "Gaya, Bihar", label: "Gaya, Bihar" },
+  { value: "Muzaffarpur, Bihar", label: "Muzaffarpur, Bihar" },
+
+  // Chhattisgarh
+  { value: "Raipur, Chhattisgarh", label: "Raipur, Chhattisgarh" },
+  { value: "Bhilai, Chhattisgarh", label: "Bhilai, Chhattisgarh" },
+
+  // Chandigarh
+  { value: "Chandigarh", label: "Chandigarh" },
+
+  // Delhi NCR
+  { value: "Delhi, Delhi", label: "Delhi, Delhi" },
+  { value: "New Delhi, Delhi", label: "New Delhi, Delhi" },
+
+  // Goa
+  { value: "Panaji, Goa", label: "Panaji, Goa" },
+  { value: "Vasco da Gama, Goa", label: "Vasco da Gama, Goa" },
+
+  // Gujarat
+  { value: "Ahmedabad, Gujarat", label: "Ahmedabad, Gujarat" },
+  { value: "Surat, Gujarat", label: "Surat, Gujarat" },
+  { value: "Vadodara, Gujarat", label: "Vadodara, Gujarat" },
+  { value: "Rajkot, Gujarat", label: "Rajkot, Gujarat" },
+  { value: "Gandhinagar, Gujarat", label: "Gandhinagar, Gujarat" },
+  
+  // Haryana
+  { value: "Gurgaon, Haryana", label: "Gurgaon, Haryana" },
+  { value: "Faridabad, Haryana", label: "Faridabad, Haryana" },
+  { value: "Panipat, Haryana", label: "Panipat, Haryana" },
+
+  // Himachal Pradesh
+  { value: "Shimla, Himachal Pradesh", label: "Shimla, Himachal Pradesh" },
+  { value: "Manali, Himachal Pradesh", label: "Manali, Himachal Pradesh" },
+
+  // Jharkhand
+  { value: "Ranchi, Jharkhand", label: "Ranchi, Jharkhand" },
+  { value: "Jamshedpur, Jharkhand", label: "Jamshedpur, Jharkhand" },
+  { value: "Dhanbad, Jharkhand", label: "Dhanbad, Jharkhand" },
+
+  // Karnataka
+  { value: "Bangalore, Karnataka", label: "Bangalore, Karnataka" },
+  { value: "Mysore, Karnataka", label: "Mysore, Karnataka" },
+  { value: "Hubli-Dharwad, Karnataka", label: "Hubli-Dharwad, Karnataka" },
+  { value: "Mangalore, Karnataka", label: "Mangalore, Karnataka" },
+  { value: "Belgaum, Karnataka", label: "Belgaum, Karnataka" },
+
+  // Kerala
+  { value: "Thiruvananthapuram, Kerala", label: "Thiruvananthapuram, Kerala" },
+  { value: "Kochi, Kerala", label: "Kochi, Kerala" },
+  { value: "Kozhikode, Kerala", label: "Kozhikode, Kerala" },
+  { value: "Thrissur, Kerala", label: "Thrissur, Kerala" },
+
+  // Madhya Pradesh
+  { value: "Indore, Madhya Pradesh", label: "Indore, Madhya Pradesh" },
+  { value: "Bhopal, Madhya Pradesh", label: "Bhopal, Madhya Pradesh" },
+  { value: "Jabalpur, Madhya Pradesh", label: "Jabalpur, Madhya Pradesh" },
+  { value: "Gwalior, Madhya Pradesh", label: "Gwalior, Madhya Pradesh" },
+
+  // Maharashtra
+  { value: "Mumbai, Maharashtra", label: "Mumbai, Maharashtra" },
+  { value: "Pune, Maharashtra", label: "Pune, Maharashtra" },
+  { value: "Nagpur, Maharashtra", label: "Nagpur, Maharashtra" },
+  { value: "Nashik, Maharashtra", label: "Nashik, Maharashtra" },
+  { value: "Thane, Maharashtra", label: "Thane, Maharashtra" },
+  { value: "Aurangabad, Maharashtra", label: "Aurangabad, Maharashtra" },
+  { value: "Solapur, Maharashtra", label: "Solapur, Maharashtra" },
+
+  // Odisha
+  { value: "Bhubaneswar, Odisha", label: "Bhubaneswar, Odisha" },
+  { value: "Cuttack, Odisha", label: "Cuttack, Odisha" },
+  { value: "Rourkela, Odisha", label: "Rourkela, Odisha" },
+
+  // Punjab
+  { value: "Ludhiana, Punjab", label: "Ludhiana, Punjab" },
+  { value: "Amritsar, Punjab", label: "Amritsar, Punjab" },
+  { value: "Jalandhar, Punjab", label: "Jalandhar, Punjab" },
+  { value: "Mohali, Punjab", label: "Mohali, Punjab" },
+
+  // Rajasthan
+  { value: "Jaipur, Rajasthan", label: "Jaipur, Rajasthan" },
+  { value: "Jodhpur, Rajasthan", label: "Jodhpur, Rajasthan" },
+  { value: "Udaipur, Rajasthan", label: "Udaipur, Rajasthan" },
+  { value: "Kota, Rajasthan", label: "Kota, Rajasthan" },
+
+  // Tamil Nadu
+  { value: "Chennai, Tamil Nadu", label: "Chennai, Tamil Nadu" },
+  { value: "Coimbatore, Tamil Nadu", label: "Coimbatore, Tamil Nadu" },
+  { value: "Madurai, Tamil Nadu", label: "Madurai, Tamil Nadu" },
+  { value: "Tiruchirappalli, Tamil Nadu", label: "Tiruchirappalli, Tamil Nadu" },
+  { value: "Salem, Tamil Nadu", label: "Salem, Tamil Nadu" },
+
+  // Telangana
+  { value: "Hyderabad, Telangana", label: "Hyderabad, Telangana" },
+  { value: "Warangal, Telangana", label: "Warangal, Telangana" },
+
+  // Uttar Pradesh
+  { value: "Lucknow, Uttar Pradesh", label: "Lucknow, Uttar Pradesh" },
+  { value: "Kanpur, Uttar Pradesh", label: "Kanpur, Uttar Pradesh" },
+  { value: "Agra, Uttar Pradesh", label: "Agra, Uttar Pradesh" },
+  { value: "Varanasi, Uttar Pradesh", label: "Varanasi, Uttar Pradesh" },
+  { value: "Noida, Uttar Pradesh", label: "Noida, Uttar Pradesh" },
+  { value: "Ghaziabad, Uttar Pradesh", label: "Ghaziabad, Uttar Pradesh" },
+  { value: "Meerut, Uttar Pradesh", label: "Meerut, Uttar Pradesh" },
+  { value: "Prayagraj, Uttar Pradesh", label: "Prayagraj, Uttar Pradesh" },
+
+  // Uttarakhand
+  { value: "Dehradun, Uttarakhand", label: "Dehradun, Uttarakhand" },
+  { value: "Haridwar, Uttarakhand", label: "Haridwar, Uttarakhand" },
+  { value: "Roorkee, Uttarakhand", label: "Roorkee, Uttarakhand" },
+
+  // West Bengal
+  { value: "Kolkata, West Bengal", label: "Kolkata, West Bengal" },
+  { value: "Asansol, West Bengal", label: "Asansol, West Bengal" },
+  { value: "Siliguri, West Bengal", label: "Siliguri, West Bengal" },
+  { value: "Durgapur, West Bengal", label: "Durgapur, West Bengal" },
+
+  // States
+  { value: "Andhra Pradesh", label: "Andhra Pradesh (State)" },
+  { value: "Arunachal Pradesh", label: "Arunachal Pradesh (State)" },
+  { value: "Assam", label: "Assam (State)" },
+  { value: "Bihar", label: "Bihar (State)" },
+  { value: "Chhattisgarh", label: "Chhattisgarh (State)" },
+  { value: "Goa", label: "Goa (State)" },
+  { value: "Gujarat", label: "Gujarat (State)" },
+  { value: "Haryana", label: "Haryana (State)" },
+  { value: "Himachal Pradesh", label: "Himachal Pradesh (State)" },
+  { value: "Jharkhand", label: "Jharkhand (State)" },
+  { value: "Karnataka", label: "Karnataka (State)" },
+  { value: "Kerala", label: "Kerala (State)" },
+  { value: "Madhya Pradesh", label: "Madhya Pradesh (State)" },
+  { value: "Maharashtra", label: "Maharashtra (State)" },
+  { value: "Manipur", label: "Manipur (State)" },
+  { value: "Meghalaya", label: "Meghalaya (State)" },
+  { value: "Mizoram", label: "Mizoram (State)" },
+  { value: "Nagaland", label: "Nagaland (State)" },
+  { value: "Odisha", label: "Odisha (State)" },
+  { value: "Punjab", label: "Punjab (State)" },
+  { value: "Rajasthan", label: "Rajasthan (State)" },
+  { value: "Sikkim", label: "Sikkim (State)" },
+  { value: "Tamil Nadu", label: "Tamil Nadu (State)" },
+  { value: "Telangana", label: "Telangana (State)" },
+  { value: "Tripura", label: "Tripura (State)" },
+  { value: "Uttar Pradesh", label: "Uttar Pradesh (State)" },
+  { value: "Uttarakhand", label: "Uttarakhand (State)" },
+  { value: "West Bengal", label: "West Bengal (State)" },
+];
 export default function ConsultationPage() {
   const [formData, setFormData] = useState({
     name: "",
@@ -23,6 +198,7 @@ export default function ConsultationPage() {
   const [step, setStep] = useState(1);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
@@ -310,15 +486,58 @@ export default function ConsultationPage() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Preferred Location *
                     </label>
-                    <input
-                      type="text"
-                      name="location"
-                      required
-                      value={formData.location}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
-                      placeholder="City, State, or Region"
-                    />
+                    <Popover open={open} onOpenChange={setOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={open}
+                          className={cn(
+                            "w-full justify-between px-4 py-6 border-gray-300 text-base font-normal hover:bg-white hover:text-black",
+                            !formData.location && "text-muted-foreground"
+                          )}
+                        >
+                          {formData.location
+                            ? indianLocations.find((loc) => loc.value === formData.location)?.label || formData.location
+                            : "Select city or state..."}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+                        <Command>
+                          <CommandInput placeholder="Search location..." />
+                          <CommandList>
+                            <CommandEmpty>No location found.</CommandEmpty>
+                            <CommandGroup className="max-h-[300px] overflow-y-auto">
+                              {indianLocations.map((loc) => (
+                                <CommandItem
+                                  key={loc.value}
+                                  value={loc.label} // Use label for searching
+                                  onSelect={(currentValue: string) => {
+                                    // currentValue is lowercase label from cmdk
+                                    // Find exact match or use current value
+                                    const match = indianLocations.find(l => l.label.toLowerCase() === currentValue.toLowerCase());
+                                    setFormData({
+                                      ...formData,
+                                      location: match ? match.value : currentValue
+                                    });
+                                    setOpen(false);
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      formData.location === loc.value ? "opacity-100" : "opacity-0"
+                                    )}
+                                  />
+                                  {loc.label}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                   </div>
 
                   <div>

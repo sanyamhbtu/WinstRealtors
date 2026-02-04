@@ -114,6 +114,18 @@ export const galleryItems = sqliteTable('gallery_items', {
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
 });
+
+// Homepage stats table
+export const homepageStats = sqliteTable('homepage_stats', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  label: text('label').notNull(),
+  value: text('value').notNull(),
+  icon: text('icon').notNull(), // Icon name to map in frontend
+  orderIndex: integer('order_index').default(0),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
+
 // Admin emails table
 export const adminEmails = sqliteTable('admin_emails', {
   id: integer('id').primaryKey({ autoIncrement: true }),

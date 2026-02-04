@@ -58,37 +58,47 @@ export default function Home() {
           setPartners(partnersData);
         }
 
-        // Fetch stats
+        // Fetch dynamic homepage stats
+        const dynStatsRes = await fetch("/api/homepage-stats");
+        let dynStats: any[] = [];
+        
+        if (dynStatsRes.ok) {
+           dynStats = await dynStatsRes.json();
+           
+           // Initialize defaults if empty (first run)
+           if (dynStats.length === 0) {
+              await fetch("/api/homepage-stats", {
+                method: "POST",
+                body: JSON.stringify({ action: "initialize" })
+              });
+              const retry = await fetch("/api/homepage-stats");
+              dynStats = await retry.json();
+           }
+        }
+
+        // Fetch properties count for the "Properties Listed" stat if not overridden
         const statsRes = await fetch("/api/admin/stats");
+        let totalProps = "0";
         if (statsRes.ok) {
           const statsData = await statsRes.json();
-          setStats([
-            { 
-              id: 1,
-              label: "Properties Listed", 
-              number: statsData.totalProperties?.toString() || "0",
-              icon: "Building"
-            },
-            { 
-              id: 2,
-              label: "Happy Clients", 
-              number: statsData.totalTestimonials?.toString() || "0",
-              icon: "Star"
-            },
-            { 
-              id: 3,
-              label: "Years Experience", 
-              number: "25+",
-              icon: "Award"
-            },
-            { 
-              id: 4,
-              label: "Total Sales Value", 
-              number: "₹25.5L+",
-              icon: "DollarSign"
-            }
-          ]);
+          totalProps = statsData.totalProperties?.toString() || "0";
         }
+        
+        // Map dynamic stats to UI format
+        // We will prioritize dynamic stats. If "Properties Listed" is in dynamic stats, use that value, 
+        // otherwise we might want to keep the auto-count.
+        // For simplicity, we will display strictly what is in the "homepage_stats" table,
+        // allowing the admin to override everything.
+        // HOWEVER, to keep the "Properties Listed" auto-updating, we can check if the value is "AUTO"
+        
+        const mappedStats = dynStats.map((stat: any) => ({
+          id: stat.id,
+          label: stat.label,
+          number: stat.value === "AUTO" ? totalProps : stat.value,
+          icon: stat.icon
+        }));
+
+        setStats(mappedStats);
       } catch (error) {
         console.error("Error fetching data:", error);
         toast.error("Failed to load some content");
@@ -169,7 +179,7 @@ export default function Home() {
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white">
-          <div className="max-w-3xl">
+          <div className="max-w-3xl pt-40 md:pt-0">
             <h1 className="font-display text-2xl md:text-5xl font-bold  mb-6 leading-tight text-shadow-luxury">
               Discover Your Dream
               <span className="block text-[#D4AF37]">Luxury Estate</span>
@@ -179,19 +189,20 @@ export default function Home() {
             </p>
 
             {/* Search Bar */}
-            <div className="bg-white/95 backdrop-blur-md rounded-lg p-6 shadow-2xl mb-8">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            {/* Search Bar */}
+            <div className="bg-white/95 backdrop-blur-md rounded-lg p-2 shadow-2xl mb-8 max-h-[50vh] overflow-y-auto md:max-h-none md:overflow-visible md:p-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 mb-2 md:mb-4">
                 <input
                   type="text"
                   placeholder="Location"
                   value={searchFilters.location}
                   onChange={(e) => setSearchFilters({ ...searchFilters, location: e.target.value })}
-                  className="px-4 py-3 rounded-lg border border-gray-300 text-[#1a2332] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+                  className="px-2 py-2 md:px-4 md:py-3 rounded-lg border border-gray-300 text-[#1a2332] text-xs md:text-base focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
                 />
                 <select 
                   value={searchFilters.propertyType}
                   onChange={(e) => setSearchFilters({ ...searchFilters, propertyType: e.target.value })}
-                  className="px-4 py-3 rounded-lg border border-gray-300 text-[#1a2332] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+                  className="px-2 py-2 md:px-4 md:py-3 rounded-lg border border-gray-300 text-[#1a2332] text-xs md:text-base focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
                 >
                   <option>Property Type</option>
                   <option>Residential</option>
@@ -202,7 +213,7 @@ export default function Home() {
                 <select 
                   value={searchFilters.priceRange}
                   onChange={(e) => setSearchFilters({ ...searchFilters, priceRange: e.target.value })}
-                  className="px-4 py-3 rounded-lg border border-gray-300 text-[#1a2332] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+                  className="px-2 py-2 md:px-4 md:py-3 rounded-lg border border-gray-300 text-[#1a2332] text-xs md:text-base focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
                 >
                   <option>Price Range</option>
                   <option>₹0 - ₹1L</option>
@@ -213,28 +224,28 @@ export default function Home() {
               </div>
               <Button 
                 onClick={handleSearch}
-                className="w-full bg-[#D4AF37] hover:bg-[#C4A030] text-white py-6 text-lg font-semibold"
+                className="w-full bg-[#D4AF37] hover:bg-[#C4A030] text-white py-2 md:py-6 text-xs md:text-lg font-semibold"
               >
-                <Search className="w-5 h-5 mr-2" />
+                <Search className="w-3 h-3 md:w-5 md:h-5 mr-2" />
                 Search Properties
               </Button>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-20 md:mb-0">
               <Button
                 asChild
                 size="lg"
-                className="bg-[#D4AF37] hover:bg-[#C4A030] text-white text-lg px-8 py-6"
+                className="bg-[#D4AF37] hover:bg-[#C4A030] text-white text-xs px-3 py-2 md:text-lg md:px-8 md:py-6 h-auto"
               >
                 <Link href="/v3/properties">
-                  Explore Properties <ArrowRight className="ml-2 w-5 h-5" />
+                  Explore Properties <ArrowRight className="ml-2 w-3 h-3 md:w-5 md:h-5" />
                 </Link>
               </Button>
               <Button
                 asChild
                 size="lg"
                 variant="outline"
-                className="border-2 border-white text-black hover:bg-amber-50 hover:text-[#1a2332] text-lg px-8 py-6"
+                className="border-2 border-white text-black hover:bg-amber-50 hover:text-[#1a2332] text-xs px-3 py-2 md:text-lg md:px-8 md:py-6 h-auto"
               >
                 <Link href="/v3/consultation">Book Consultation</Link>
               </Button>
