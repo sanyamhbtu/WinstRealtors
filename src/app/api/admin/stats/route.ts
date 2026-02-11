@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { properties, blogPosts, testimonials, partners, bookings, contacts, faqs, galleryItems } from '@/db/schema';
-import { eq, count, sql } from 'drizzle-orm';
+import { eq, count } from 'drizzle-orm';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Execute all count queries in parallel for better performance
     const [

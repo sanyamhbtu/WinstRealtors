@@ -53,7 +53,7 @@ export function useSession(): SessionData {
     fetchSession()
   }, [fetchSession])
 
-   const refetch = useCallback(async (queryParams?: { query?: unknown }) : Promise<void> => {
+   const refetch = useCallback(async (_queryParams?: { query?: unknown }) : Promise<void> => {
       setIsRefetching(true);
       try {
          await fetchSession();

@@ -214,6 +214,10 @@ export default function ContactPage() {
                       <a href="tel:+918130184250" className="text-gray-600 hover:text-[#D4AF37]">
                         +91 81301 84250
                       </a>
+                      <br />
+                      <a href="tel:+918679001703" className="text-gray-600 hover:text-[#D4AF37]">
+                        +91 86790 01703
+                      </a>
                     </div>
                   </div>
 

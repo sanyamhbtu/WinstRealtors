@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { Calendar, User, Clock, ArrowLeft, Share2, Facebook, Twitter, Linkedin } from "lucide-react";
+import { Calendar, Clock, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 interface Blog {
@@ -37,7 +37,7 @@ export default function BlogDetailPage({ params }: { params: Promise<{ id: strin
         }
 
         const data = await res.json();
-        console.log("data", data);
+
         setPost(data);
       } catch (error) {
         console.error("Error fetching blog:", error);
@@ -54,7 +54,7 @@ export default function BlogDetailPage({ params }: { params: Promise<{ id: strin
             Blog Not Found
           </h1>
           <p className="text-gray-600 mb-6">
-            The Blog you're looking for doesn't exist or has been removed.
+            The Blog you&apos;re looking for doesn&apos;t exist or has been removed.
           </p>
           <Button asChild className="bg-[#D4AF37] hover:bg-[#B8941F] text-white">
             <Link href="/v3/blog">Back to Blog</Link>

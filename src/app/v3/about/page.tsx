@@ -99,7 +99,7 @@ export default function AboutPage() {
             Excellence in Luxury Real Estate
           </h1>
           <p className="text-xl md:text-2xl text-gray-200 leading-relaxed">
-            Since 2025, we've been the trusted partner for discerning clients seeking exceptional properties worldwide
+            Since 2025, we&apos;ve been the trusted partner for discerning clients seeking exceptional properties worldwide
           </p>
         </div>
       </section>

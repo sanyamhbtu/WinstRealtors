@@ -38,9 +38,11 @@ export async function GET(request: NextRequest) {
     const publishedParam = searchParams.get('published');
     const category = searchParams.get('category');
 
-    let query: any = db.select().from(blogPosts);
+    // Start with a dynamic query
+    let query = db.select().from(blogPosts).$dynamic();
 
     // Build filter conditions
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const conditions: any[] = [];
 
     if (search) {
@@ -179,6 +181,7 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
 
     // Build update object with only provided fields
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updates: any = {
       updatedAt: new Date().toISOString(),
     };

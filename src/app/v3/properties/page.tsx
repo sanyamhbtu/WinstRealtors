@@ -49,6 +49,7 @@ export default function PropertiesPage() {
         if (res.ok) {
           const data = await res.json();
           // Transform API data to match PropertyCard interface
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const transformedData = data.map((prop: any) => ({
             id: prop.id.toString(),
             title: prop.title,
@@ -104,6 +105,7 @@ export default function PropertiesPage() {
     }
     
     setFilters(newFilters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
   const handleFilterChange = (key: string, value: string) => {
@@ -174,7 +176,7 @@ export default function PropertiesPage() {
             Luxury Properties
           </h1>
           <p className="text-xl text-gray-300 max-w-2xl">
-            Discover exceptional estates, penthouses, and commercial properties in the world's most desirable locations
+            Discover exceptional estates, penthouses, and commercial properties in the world&apos;s most desirable locations
           </p>
         </div>
       </section>

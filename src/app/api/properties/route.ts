@@ -3,18 +3,30 @@ import { db } from '@/db';
 import { properties } from '@/db/schema';
 import { eq, like, and, or, desc } from 'drizzle-orm';
   
+function parseImages(value: unknown) {
+  try {
+    if (!value) return [];
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'string') return JSON.parse(value);
+    return [];
+  } catch {
+    return [];
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
+
     // Single property fetch
     if (id) {
-      // if (!id || isNaN(parseInt(id))) {
-      //   return NextResponse.json(
-      //     { error: 'Valid ID is required', code: 'INVALID_ID' },
-      //     { status: 400 }
-      //   );
-      // }
+      if (isNaN(parseInt(id))) {
+        return NextResponse.json(
+          { error: 'Valid ID is required', code: 'INVALID_ID' },
+          { status: 400 }
+        );
+      }
 
       const property = await db
         .select()
@@ -28,7 +40,6 @@ export async function GET(request: NextRequest) {
           { status: 404 }
         );
       }
-      
 
       // Parse images JSON string to array
       const propertyData = {
@@ -50,18 +61,8 @@ export async function GET(request: NextRequest) {
     const sort = searchParams.get('sort') ?? 'createdAt';
     const order = searchParams.get('order') ?? 'desc';
 
-    let query: any = db.select().from(properties);
-    function parseImages(value: any) {
-        try {
-          if (!value) return [];
-          if (Array.isArray(value)) return value;
-          return JSON.parse(value);
-        } catch {
-          return [];
-        }
-    }
-
     // Build filter conditions
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const conditions: any[] = [];
 
     if (search) {
@@ -80,7 +81,7 @@ export async function GET(request: NextRequest) {
 
     if (featured !== null) {
       const val = featured === "true" || featured === "1";
-  conditions.push(eq(properties.featured, val));
+      conditions.push(eq(properties.featured, val));
     }
 
     if (type) {
@@ -91,29 +92,33 @@ export async function GET(request: NextRequest) {
       conditions.push(eq(properties.category, category));
     }
 
+    let query = db.select().from(properties).$dynamic();
+
     if (conditions.length > 0) {
       query = query.where(and(...conditions));
     }
 
     // Apply sorting
     const allowedSorts = ["createdAt", "price", "title", "category"];
-const sortKey = allowedSorts.includes(sort) ? sort : "createdAt";
-const sortColumn = (properties as any)[sortKey];
+    const sortKey = allowedSorts.includes(sort) ? sort : "createdAt";
+    
+    // Type-safe column selection
+    const sortColumn = properties[sortKey as keyof typeof properties];
 
     if (order === 'asc') {
-      query = query.orderBy(sortColumn);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      query = query.orderBy(sortColumn as any);
     } else {
-      query = query.orderBy(desc(sortColumn));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      query = query.orderBy(desc(sortColumn as any));
     }
 
     const results = await query.limit(limit).offset(offset);
 
-    // Parse images for all properties
-
-    const parsedResults = results.map((p: any) => ({
-  ...p,
-  images: parseImages(p.images),
-}));
+    const parsedResults = results.map((p) => ({
+      ...p,
+      images: parseImages(p.images),
+    }));
 
     return NextResponse.json(parsedResults, { status: 200 });
   } catch (error) {
@@ -258,7 +263,7 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
 
     // Build update object with only provided fields
-    const updates: Record<string, any> = {};
+    const updates: Record<string, unknown> = {};
     updates.updatedAt = new Date().toISOString();
 
     if (body.title !== undefined) updates.title = body.title.trim();

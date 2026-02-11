@@ -39,9 +39,11 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
     const ratingFilter = searchParams.get('rating');
 
-    let query: any = db.select().from(testimonials);
+    // Start with a dynamic query
+    let query = db.select().from(testimonials).$dynamic();
 
-    const conditions = [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const conditions: any[] = [];
 
     // Search filter
     if (search) {
@@ -174,7 +176,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const updates: Record<string, any> = {};
+    const updates: Record<string, unknown> = {};
 
     // Validate and sanitize fields if provided
     if (body.name !== undefined) {

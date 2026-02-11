@@ -40,9 +40,11 @@ export async function GET(request: NextRequest) {
     const publishedParam = searchParams.get('published');
     const categoryParam = searchParams.get('category');
 
-    let query: any = db.select().from(galleryItems);
+    // Start with a dynamic query
+    let query = db.select().from(galleryItems).$dynamic();
 
     // Build where conditions
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const conditions: any[] = [];
 
     if (search) {
@@ -169,7 +171,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const updates: Record<string, any> = {};
+    const updates: Record<string, unknown> = {};
 
     // Process updates for allowed fields
     if (body.title !== undefined) {

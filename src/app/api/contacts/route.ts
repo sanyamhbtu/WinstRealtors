@@ -39,10 +39,12 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
     const status = searchParams.get('status');
 
-    let query: any = db.select().from(contacts);
+    // Start with a dynamic query
+    let query = db.select().from(contacts).$dynamic();
 
     // Build where conditions
-    const conditions = [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const conditions: any[] = [];
 
     if (search) {
       conditions.push(
@@ -173,6 +175,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updates: any = {};
 
     // Sanitize and include provided fields

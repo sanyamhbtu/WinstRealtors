@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import PropertyCard from "@/components/shared/PropertyCard";
-import { ArrowRight, Building, DollarSign, Star, Award, ChevronLeft, ChevronRight, Search, Loader2, IndianRupee } from "lucide-react";
+import { ArrowRight, Building, DollarSign, Star, Award, ChevronLeft, ChevronRight, Search, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import Navigation from "@/components/shared/Navigation";
@@ -17,7 +17,7 @@ import LeftSideBar from "@/components/shared/LeftSideBar";
 export default function Home() {
   const router = useRouter();
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
-  const [countUp, setCountUp] = useState(false);
+  // const [countUp, setCountUp] = useState(false);
   const [searchFilters, setSearchFilters] = useState({
     location: "",
     propertyType: "",
@@ -25,9 +25,13 @@ export default function Home() {
   });
 
   // State for fetched data
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [featuredProperties, setFeaturedProperties] = useState<any[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [testimonials, setTestimonials] = useState<any[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [partners, setPartners] = useState<any[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [stats, setStats] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -60,6 +64,7 @@ export default function Home() {
 
         // Fetch dynamic homepage stats
         const dynStatsRes = await fetch("/api/homepage-stats");
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let dynStats: any[] = [];
         
         if (dynStatsRes.ok) {
@@ -114,7 +119,7 @@ export default function Home() {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          setCountUp(true);
+          // setCountUp(true);
         }
       },
       { threshold: 0.5 }
@@ -154,6 +159,7 @@ export default function Home() {
     setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const iconMap: Record<string, any> = {
     Building,
     DollarSign,
@@ -182,10 +188,10 @@ export default function Home() {
           <div className="max-w-3xl pt-40 md:pt-0">
             <h1 className="font-display text-2xl md:text-5xl font-bold  mb-6 leading-tight text-shadow-luxury">
               Discover Your Dream
-              <span className="block text-[#D4AF37]">Luxury Estate</span>
+              <span className="block text-[#D4AF37]">&quot;Luxury Estate&quot;</span>
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-gray-200 leading-relaxed">
-              Experience unparalleled elegance with our curated collection of the world's most prestigious properties.
+              Experience unparalleled elegance with our curated collection of the world&apos;s most prestigious properties.
             </p>
 
             {/* Search Bar */}
@@ -413,7 +419,7 @@ export default function Home() {
                     ))}
                   </div>
                   <p className="text-xl italic mb-6 leading-relaxed">
-                    "{testimonials[currentTestimonial].content}"
+                    &quot;{testimonials[currentTestimonial].content}&quot;
                   </p>
                   <p className="font-display text-2xl font-semibold mb-1">
                     {testimonials[currentTestimonial].name}
@@ -469,7 +475,7 @@ export default function Home() {
               Our Trusted Partners
             </h2>
             <p className="text-xl text-gray-600">
-              Collaborating with the world's leading real estate networks
+              Collaborating with the world&apos;s leading real estate networks
             </p>
           </div>
 

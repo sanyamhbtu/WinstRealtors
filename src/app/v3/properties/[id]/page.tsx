@@ -116,13 +116,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
     setCurrentImage((prev) => (prev - 1 + allImages.length) % allImages.length);
   };
 
-  // Mock agent data (you can enhance this later with real agent data)
-  const agent = {
-    name: "Vanshika Tomar",
-    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop",
-    phone: "+91 3892849982",
-    email: "hr@winstrealtors.com",
-  };
+
 
   return (
     <main className="min-h-screen pt-20">
@@ -341,40 +335,35 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
             {/* Sidebar */}
             <div className="lg:col-span-1">
               <div className="sticky top-24 space-y-6">
-                {/* Agent Card */}
+                {/* Contact Card */}
                 <div className="bg-white rounded-lg p-6 shadow-md">
                   <h3 className="font-display text-xl font-bold text-[#1a2332] mb-4">
-                    Contact Agent
+                    Contact Us
                   </h3>
                   <div className="flex items-center space-x-4 mb-6">
-                    <div className="relative w-16 h-16 rounded-full overflow-hidden">
-                      <Image
-                        src={agent.image}
-                        alt={agent.name}
-                        fill
-                        className="object-cover"
-                      />
+                    <div className="relative w-16 h-16 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
+                       <MessageCircle className="w-8 h-8 text-[#D4AF37]" />
                     </div>
                     <div>
-                      <p className="font-semibold text-[#1a2332]">{agent.name}</p>
-                      <p className="text-sm text-gray-600">Senior Agent</p>
+                      <p className="font-semibold text-[#1a2332]">Winst Realtors</p>
+                      <p className="text-sm text-gray-600">Real Estate Experts</p>
                     </div>
                   </div>
 
                   <div className="space-y-3 mb-6">
                     <a
-                      href={`tel:${agent.phone}`}
+                      href="tel:+919876543210"
                       className="flex items-center space-x-3 text-gray-700 hover:text-[#D4AF37] transition-colors"
                     >
                       <Phone className="w-5 h-5" />
-                      <span>{agent.phone}</span>
+                      <span>+91 98765 43210</span>
                     </a>
                     <a
-                      href={`mailto:${agent.email}`}
+                      href="mailto:info@winstrealtors.com"
                       className="flex items-center space-x-3 text-gray-700 hover:text-[#D4AF37] transition-colors"
                     >
                       <Mail className="w-5 h-5" />
-                      <span className="text-sm">{agent.email}</span>
+                      <span className="text-sm">info@winstrealtors.com</span>
                     </a>
                   </div>
 

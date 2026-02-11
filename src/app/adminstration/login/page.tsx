@@ -53,7 +53,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       router.push(redirect);
     }, 1000);
 
-  } catch (error) {
+  } catch {
     toast.error("An unexpected error occurred");
   }
 
@@ -78,6 +78,7 @@ const handleSubmit = async (e: React.FormEvent) => {
           <div className="mb-8">
             <Link href="/adminstration" className="flex items-center space-x-3 mb-8">
               <div className="w-25 h-25  rounded flex items-center justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="https://res.cloudinary.com/dxxielg5u/image/upload/v1764957758/winst-removebg-preview_qancvd.png" alt="Winst Logo" />
               </div>
               <span className="font-display text-xl font-bold text-[#1a2332]">

@@ -40,10 +40,12 @@ export async function GET(request: NextRequest) {
     const published = searchParams.get('published');
     const category = searchParams.get('category');
 
-    let query: any = db.select().from(faqs);
+    // Start with a dynamic query
+    let query = db.select().from(faqs).$dynamic();
 
     // Build where conditions
-    const conditions = [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const conditions: any[] = [];
 
     // Search across question, answer, and category
     if (search) {
@@ -168,6 +170,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updates: any = {};
 
     // Only include fields that are provided in the request

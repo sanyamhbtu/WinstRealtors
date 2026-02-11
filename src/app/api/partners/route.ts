@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
 
     // Use a permissive type to avoid incompatible select-base variations when chaining conditional clauses
-    let query: any = db.select().from(partners);
+    let query = db.select().from(partners).$dynamic();
 
     if (search) {
       query = query.where(like(partners.name, `%${search}%`));

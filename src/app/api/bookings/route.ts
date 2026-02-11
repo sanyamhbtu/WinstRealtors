@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { bookings } from '@/db/schema';
-import { eq, like, or, desc, and } from 'drizzle-orm';
-import { createCalendarEvent, deleteCalendarEvent } from '@/lib/calendar-event';
-import { isCalendarConfigured } from '@/lib/google-calendar';
+import { sendBookingConfirmation, sendBookingCancellation } from '@/lib/mail';
+import { eq, like, or, desc, and, type SQL } from 'drizzle-orm';
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,7 +11,7 @@ export async function GET(request: NextRequest) {
 
     // Single booking by ID
     if (id) {
-      if (!id || isNaN(parseInt(id))) {
+      if (isNaN(parseInt(id))) {
         return NextResponse.json({ 
           error: "Valid ID is required",
           code: "INVALID_ID" 
@@ -41,10 +40,8 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status');
     const date = searchParams.get('date');
 
-    const baseQuery = db.select().from(bookings);
-
     // Build where conditions
-    const conditions = [];
+    const conditions: SQL[] = [];
 
     if (search) {
       conditions.push(
@@ -52,7 +49,7 @@ export async function GET(request: NextRequest) {
           like(bookings.name, `%${search}%`),
           like(bookings.email, `%${search}%`),
           like(bookings.phone, `%${search}%`)
-        )
+        )! // Non-null assertion strictly for the OR construction if needed
       );
     }
 
@@ -64,11 +61,10 @@ export async function GET(request: NextRequest) {
       conditions.push(eq(bookings.date, date));
     }
 
-    const query = conditions.length > 0
-      ? baseQuery.where(and(...conditions))
-      : baseQuery;
-
-    const results = await query
+    // execute query
+    const results = await db.select()
+      .from(bookings)
+      .where(conditions.length > 0 ? and(...conditions) : undefined)
       .orderBy(desc(bookings.date))
       .limit(limit)
       .offset(offset);
@@ -89,44 +85,16 @@ export async function POST(request: NextRequest) {
     const { name, email, phone, date, time, propertyType, budget, location, message, status, notes } = body;
 
     // Validate required fields
-    if (!name) {
-      return NextResponse.json({ 
-        error: "Name is required",
-        code: "MISSING_NAME" 
-      }, { status: 400 });
-    }
+    if (!name) return NextResponse.json({ error: "Name is required", code: "MISSING_NAME" }, { status: 400 });
+    if (!email) return NextResponse.json({ error: "Email is required", code: "MISSING_EMAIL" }, { status: 400 });
+    if (!phone) return NextResponse.json({ error: "Phone is required", code: "MISSING_PHONE" }, { status: 400 });
+    if (!date) return NextResponse.json({ error: "Date is required", code: "MISSING_DATE" }, { status: 400 });
+    if (!time) return NextResponse.json({ error: "Time is required", code: "MISSING_TIME" }, { status: 400 });
 
-    if (!email) {
-      return NextResponse.json({ 
-        error: "Email is required",
-        code: "MISSING_EMAIL" 
-      }, { status: 400 });
-    }
-
-    if (!phone) {
-      return NextResponse.json({ 
-        error: "Phone is required",
-        code: "MISSING_PHONE" 
-      }, { status: 400 });
-    }
-
-    if (!date) {
-      return NextResponse.json({ 
-        error: "Date is required",
-        code: "MISSING_DATE" 
-      }, { status: 400 });
-    }
-
-    if (!time) {
-      return NextResponse.json({ 
-        error: "Time is required",
-        code: "MISSING_TIME" 
-      }, { status: 400 });
-    }
-
-    // Prepare insert data with defaults and auto-generated fields
     const timestamp = new Date().toISOString();
-    const insertData = {
+    
+    // Type-safe insertion object
+    const insertData: typeof bookings.$inferInsert = {
       name: name.trim(),
       email: email.trim().toLowerCase(),
       phone: phone.trim(),
@@ -163,10 +131,7 @@ export async function PUT(request: NextRequest) {
     const id = searchParams.get('id');
 
     if (!id || isNaN(parseInt(id))) {
-      return NextResponse.json({ 
-        error: "Valid ID is required",
-        code: "INVALID_ID" 
-      }, { status: 400 });
+      return NextResponse.json({ error: "Valid ID is required", code: "INVALID_ID" }, { status: 400 });
     }
 
     // Check if booking exists
@@ -176,10 +141,7 @@ export async function PUT(request: NextRequest) {
       .limit(1);
 
     if (existingBooking.length === 0) {
-      return NextResponse.json({ 
-        error: 'Booking not found',
-        code: "BOOKING_NOT_FOUND" 
-      }, { status: 404 });
+      return NextResponse.json({ error: 'Booking not found', code: "BOOKING_NOT_FOUND" }, { status: 404 });
     }
 
     const body = await request.json();
@@ -189,8 +151,8 @@ export async function PUT(request: NextRequest) {
     const oldStatus = oldBooking.status;
     const newStatus = status || oldStatus;
 
-    // Prepare update data (only include provided fields)
-    const updateData: Record<string, any> = {
+    // Use Partial of the schema insert type for type safety
+    const updateData: Partial<typeof bookings.$inferInsert> = {
       updatedAt: new Date().toISOString(),
     };
 
@@ -206,57 +168,40 @@ export async function PUT(request: NextRequest) {
     if (status !== undefined) updateData.status = status.trim();
     if (notes !== undefined) updateData.notes = notes?.trim() || null;
 
-    // Handle Google Calendar integration when status changes to "Confirmed"
+    // Handle Email Notifications for Status Changes
     if (oldStatus !== 'Confirmed' && newStatus === 'Confirmed') {
-      try {
-        if (isCalendarConfigured()) {
-          const calendarEvent = await createCalendarEvent({
-            title: `Consultation: ${oldBooking.name}`,
-            description: `
-Consultation Details:
-- Client: ${oldBooking.name}
-- Email: ${oldBooking.email}
-- Phone: ${oldBooking.phone}
-${oldBooking.propertyType ? `- Property Type: ${oldBooking.propertyType}` : ''}
-${oldBooking.budget ? `- Budget: ${oldBooking.budget}` : ''}
-${oldBooking.location ? `- Preferred Location: ${oldBooking.location}` : ''}
-${oldBooking.message ? `\nMessage:\n${oldBooking.message}` : ''}
-            `.trim(),
-            date: updateData.date || oldBooking.date,
-            time: updateData.time || oldBooking.time,
-            duration: 60, // 1 hour consultation
-            attendees: [
-              { 
-                email: updateData.email || oldBooking.email,
-                displayName: updateData.name || oldBooking.name
-              }
-            ],
-            location: updateData.location || oldBooking.location || undefined,
-          });
+      const eventName = updateData.name ?? oldBooking.name;
+      const eventEmail = updateData.email ?? oldBooking.email;
+      const eventDate = updateData.date ?? oldBooking.date;
+      const eventTime = updateData.time ?? oldBooking.time;
+      const eventMsg = updateData.message ?? oldBooking.message;
+      const eventLoc = updateData.location ?? oldBooking.location;
 
-          if (calendarEvent.eventId) {
-            updateData.googleCalendarEventId = calendarEvent.eventId;
-            console.log('Google Calendar event created:', calendarEvent.eventId);
-          }
-        }
-      } catch (calendarError) {
-        console.error('Failed to create calendar event:', calendarError);
-        // Don't fail the booking update if calendar creation fails
-      }
+      await sendBookingConfirmation({
+        name: eventName,
+        email: eventEmail,
+        date: eventDate,
+        time: eventTime,
+        title: `Consultation with ${eventName}`,
+        description: eventMsg || undefined,
+        location: eventLoc || undefined,
+        duration: 60
+      });
     }
 
-    // Handle Google Calendar event deletion when status changes to "Cancelled"
-    if (oldStatus === 'Confirmed' && newStatus === 'Cancelled' && oldBooking.googleCalendarEventId) {
-      try {
-        if (isCalendarConfigured()) {
-          await deleteCalendarEvent(oldBooking.googleCalendarEventId);
-          updateData.googleCalendarEventId = null;
-          console.log('Google Calendar event deleted:', oldBooking.googleCalendarEventId);
-        }
-      } catch (calendarError) {
-        console.error('Failed to delete calendar event:', calendarError);
-        // Don't fail the booking update if calendar deletion fails
-      }
+    if (oldStatus === 'Confirmed' && newStatus === 'Cancelled') {
+      const eventName = updateData.name ?? oldBooking.name;
+      const eventEmail = updateData.email ?? oldBooking.email;
+      const eventDate = updateData.date ?? oldBooking.date;
+      const eventTime = updateData.time ?? oldBooking.time;
+
+      await sendBookingCancellation({
+        name: eventName,
+        email: eventEmail,
+        date: eventDate,
+        time: eventTime,
+        title: `Consultation with ${eventName}`
+      });
     }
 
     const updatedBooking = await db.update(bookings)
@@ -280,10 +225,7 @@ export async function DELETE(request: NextRequest) {
     const id = searchParams.get('id');
 
     if (!id || isNaN(parseInt(id))) {
-      return NextResponse.json({ 
-        error: "Valid ID is required",
-        code: "INVALID_ID" 
-      }, { status: 400 });
+      return NextResponse.json({ error: "Valid ID is required", code: "INVALID_ID" }, { status: 400 });
     }
 
     // Check if booking exists
@@ -293,22 +235,20 @@ export async function DELETE(request: NextRequest) {
       .limit(1);
 
     if (existingBooking.length === 0) {
-      return NextResponse.json({ 
-        error: 'Booking not found',
-        code: "BOOKING_NOT_FOUND" 
-      }, { status: 404 });
+      return NextResponse.json({ error: 'Booking not found', code: "BOOKING_NOT_FOUND" }, { status: 404 });
     }
 
-    // Delete Google Calendar event if it exists
     const booking = existingBooking[0];
-    if (booking.googleCalendarEventId && isCalendarConfigured()) {
-      try {
-        await deleteCalendarEvent(booking.googleCalendarEventId);
-        console.log('Google Calendar event deleted:', booking.googleCalendarEventId);
-      } catch (calendarError) {
-        console.error('Failed to delete calendar event:', calendarError);
-        // Continue with booking deletion even if calendar deletion fails
-      }
+
+    // Send cancellation email if it was confirmed
+    if (booking.status === 'Confirmed') {
+      await sendBookingCancellation({
+        name: booking.name,
+        email: booking.email,
+        date: booking.date,
+        time: booking.time,
+        title: `Consultation with ${booking.name}`
+      });
     }
 
     const deletedBooking = await db.delete(bookings)
