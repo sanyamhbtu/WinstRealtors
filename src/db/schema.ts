@@ -200,3 +200,15 @@ export const verification = sqliteTable("verification", {
     () => new Date(),
   ),
 });
+
+// Traffic logs table
+export const trafficLogs = sqliteTable('traffic_logs', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  path: text('path'),
+  userAgent: text('user_agent'),
+  ipHash: text('ip_hash'),
+  country: text('country'),
+  city: text('city'),
+  device: text('device'),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()).notNull(),
+});

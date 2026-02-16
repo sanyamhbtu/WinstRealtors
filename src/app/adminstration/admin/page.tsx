@@ -24,10 +24,24 @@ import {
   Mail,
   Settings,
   Menu,
+  Activity,
   Award
 } from "lucide-react";
 import { toast } from "sonner";
 import { useSession, authClient } from "@/lib/auth-client";
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend
+} from 'recharts';
 
 interface DashboardStats {
   totalProperties: number;
@@ -78,6 +92,10 @@ export default function AdminDashboard() {
   const [galleryItems, setGalleryItems] = useState<any[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [homepageStats, setHomepageStats] = useState<any[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [analyticsData, setAnalyticsData] = useState<any>(null);
+  const [analyticsView, setAnalyticsView] = useState<'daily' | 'weekly' | 'monthly'>('daily');
+
   const [loading, setLoading] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [editingItem, setEditingItem] = useState<any>(null);
@@ -156,6 +174,10 @@ export default function AdminDashboard() {
           endpoint = "/api/homepage-stats";
           setter = setHomepageStats;
           break;
+        case "analytics":
+          endpoint = "/api/admin/analytics";
+          setter = setAnalyticsData;
+          break;
       }
 
       if (endpoint && setter) {
@@ -170,7 +192,7 @@ export default function AdminDashboard() {
     }
   };
 
-    // Fetch admin emails
+  // Fetch admin emails
   const fetchAdminEmails = async () => {
     try {
       const token = localStorage.getItem("bearer_token");
@@ -679,11 +701,11 @@ export default function AdminDashboard() {
 
       {/* Sidebar */}
       <aside className={`
-        w-64 bg-[#1a2332] text-white fixed h-full z-50 transition-transform duration-300
+        w-64 bg-[#1a2332] text-white fixed h-full z-50 transition-transform duration-300 flex flex-col
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0
       `}>
-        <div className="p-6">
+        <div className="p-6 flex-1 overflow-y-auto">
           <div className="flex items-center justify-between mb-8">
             <h2 className="font-display text-2xl font-bold text-[#D4AF37]">
               Winst Admin
@@ -698,6 +720,7 @@ export default function AdminDashboard() {
           <nav className="space-y-2">
             {[
               { id: "dashboard", icon: LayoutDashboard, label: "Dashboard" },
+              { id: "analytics", icon: Activity, label: "Analytics" },
               { id: "properties", icon: Home, label: "Properties" },
               { id: "blogs", icon: FileText, label: "Blog Posts" },
               { id: "gallery", icon: ImageIcon, label: "Gallery" },
@@ -726,7 +749,7 @@ export default function AdminDashboard() {
             })}
           </nav>
         </div>
-        <div className="absolute bottom-0 left-0 right-0 p-6">
+        <div className="p-6 border-t border-white/10">
           <button 
             onClick={handleLogout}
             className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-white/10 transition-colors"
@@ -754,6 +777,7 @@ export default function AdminDashboard() {
               <div className="flex-1">
                 <h1 className="font-display text-2xl md:text-3xl font-bold text-[#1a2332] mb-1 md:mb-2">
                   {activeTab === "dashboard" && "Dashboard Overview"}
+                  {activeTab === "analytics" && "Traffic Analytics"}
                   {activeTab === "properties" && "Manage Properties"}
                   {activeTab === "blogs" && "Blog Management"}
                   {activeTab === "gallery" && "Gallery Management"}
@@ -770,7 +794,7 @@ export default function AdminDashboard() {
             </div>
             
             {/* Add New Button */}
-            {activeTab !== "dashboard" && activeTab !== "contacts" && activeTab !== "settings" && (
+            {activeTab !== "dashboard" && activeTab !== "contacts" && activeTab !== "settings" && activeTab !== "analytics" && (
               <Button
                 onClick={() => handleAdd(activeTab)}
                 className="bg-[#D4AF37] hover:bg-[#B8941F] text-white w-full sm:w-auto"
@@ -828,6 +852,168 @@ export default function AdminDashboard() {
               </div>
             </div>
           )}
+
+          {/* Analytics Content */}
+          {activeTab === "analytics" && (
+            <div className="space-y-6">
+              {/* Analytics Stats Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="bg-white rounded-lg p-6 shadow-md border-l-4 border-[#D4AF37]">
+                  <p className="text-gray-500 text-sm mb-1 uppercase tracking-wide">Total Page Views</p>
+                  <p className="font-display text-4xl font-bold text-[#1a2332]">{analyticsData?.stats?.totalVisits || 0}</p>
+                </div>
+                <div className="bg-white rounded-lg p-6 shadow-md border-l-4 border-[#F2D06B]">
+                  <p className="text-gray-500 text-sm mb-1 uppercase tracking-wide">Unique Visitors</p>
+                  <p className="font-display text-4xl font-bold text-[#1a2332]">{analyticsData?.stats?.uniqueVisitors || 0}</p>
+                </div>
+              </div>
+
+              {/* Charts Section */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Traffic Trends Chart */}
+                <div className="lg:col-span-2 bg-white rounded-lg shadow-md p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="font-display text-lg font-bold text-[#1a2332]">Traffic Trends</h3>
+                    <div className="flex bg-gray-100 rounded-lg p-1">
+                      {(['daily', 'weekly', 'monthly'] as const).map((view) => (
+                        <button
+                          key={view}
+                          onClick={() => setAnalyticsView(view)}
+                          className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
+                            analyticsView === view 
+                              ? "bg-white text-[#1a2332] shadow-sm" 
+                              : "text-gray-500 hover:text-gray-700"
+                          }`}
+                        >
+                          {view.charAt(0).toUpperCase() + view.slice(1)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="h-[300px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={analyticsData?.stats?.[analyticsView] || []}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                        <XAxis 
+                          dataKey={analyticsView === 'daily' ? 'date' : analyticsView === 'weekly' ? 'week' : 'month'} 
+                          axisLine={false}
+                          tickLine={false}
+                          tick={{ fill: '#6B7280', fontSize: 12 }}
+                          dy={10}
+                        />
+                        <YAxis 
+                          axisLine={false}
+                          tickLine={false}
+                          tick={{ fill: '#6B7280', fontSize: 12 }}
+                        />
+                        <Tooltip 
+                          contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                          cursor={{ fill: '#F3F4F6' }}
+                        />
+                        <Bar 
+                          dataKey="count" 
+                          fill="#D4AF37" 
+                          radius={[4, 4, 0, 0]}
+                          name="Visits"
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Device Breakdown Chart */}
+                <div className="bg-white rounded-lg shadow-md p-6">
+                  <h3 className="font-display text-lg font-bold text-[#1a2332] mb-6">Device Breakdown</h3>
+                  <div className="h-[300px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={analyticsData?.stats?.devices || []}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={80}
+                          paddingAngle={5}
+                          dataKey="count"
+                          nameKey="device_type"
+                        >
+                           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                          {(analyticsData?.stats?.devices || []).map((entry: any, index: number) => (
+                            <Cell key={`cell-${index}`} fill={index === 0 ? "#D4AF37" : "#1a2332"} />
+                          ))}
+                        </Pie>
+                        <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                        <Legend verticalAlign="bottom" height={36} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </div>
+
+               {/* Top Countries */}
+               {analyticsData?.stats?.topCountries && analyticsData.stats.topCountries.length > 0 && (
+                 <div className="bg-white rounded-lg shadow-md p-6">
+                    <h3 className="font-display text-lg font-bold text-[#1a2332] mb-4">Top Countries</h3>
+                    <div className="space-y-3">
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                      {analyticsData.stats.topCountries.map((country: any, i: number) => (
+                        <div key={i} className="flex items-center justify-between border-b border-gray-100 last:border-0 pb-2 last:pb-0">
+                          <span className="text-gray-700 font-medium">{country.country}</span>
+                          <span className="bg-[#D4AF37]/10 text-[#D4AF37] px-2 py-1 rounded text-xs font-bold">{country.count}</span>
+                        </div>
+                      ))}
+                    </div>
+                 </div>
+               )}
+
+              {/* Recent Traffic Table */}
+              <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-100">
+                   <h3 className="font-display text-lg font-bold text-[#1a2332]">Recent Activity Log</h3>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Path</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Device</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                      {analyticsData?.recentLogs?.map((log: any) => (
+                        <tr key={log.id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                             {new Date(log.createdAt).toLocaleString()}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#1a2332]">
+                             {log.path}
+                          </td>
+                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                             {/* Parse simplistic user agent detection or show raw */}
+                             {log.userAgent?.includes("Mobile") ? "Mobile" : "Desktop"}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {log.city || "Unknown"}, {log.country || ""}
+                          </td>
+                        </tr>
+                      ))}
+                      {!analyticsData?.recentLogs?.length && (
+                        <tr>
+                          <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                            No traffic data yet.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
 
           {/* Settings Content */}
           {activeTab === "settings" && (

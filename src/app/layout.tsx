@@ -9,6 +9,8 @@ export const metadata: Metadata = {
   description: "Discover exceptional luxury properties with Winst Realtors. Specializing in high-end residential and commercial real estate worldwide.",
 };
 
+import TrafficTracker from "@/components/TrafficTracker";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -18,6 +20,7 @@ export default function RootLayout({
     <html lang="en" className="smooth-scroll">
       <body className="antialiased">
         <ErrorReporter />
+        <TrafficTracker />
         <Script
           id="suppress-extension-errors"
           strategy="beforeInteractive"
